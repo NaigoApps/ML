@@ -1,2 +1,3 @@
-for i in range(1,10):
-    print i
+import xml.etree.ElementTree as ET
+tree = ET.parse('country_data.xml')
+root = tree.getroot()
