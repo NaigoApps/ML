@@ -1,55 +1,44 @@
+import time
+
 import parserFile
-from miml_svm import MiMlSVM
-import random
+import prepareMIML
+import nltk
+import nltk.data
 
 if __name__ == "__main__":
     # Open the first Reuters data set and create the parser
-    # filename = "dataset/reut2-000.sgm"
-    # parser = parserFile.ReutersParser()
+    filename = "dataset/reut2-000.sgm"
+    parser = parserFile.ReutersParser()
 
     # Parse the document and force all generated docs into
     # a list so that it can be printed out to the console
-    # doc = parser.parse(open(filename, 'rb'))
-    # print list(doc)[0][0]
-    # pprint.pprint(list(doc))
-    datasetSize = 100
-    testsetSize = 20
-    featuresNumber = 2
-    labelsNumber = 3
-    minInstances = 5
-    maxInstances = 20
-    dataset = []
-    for document in range(datasetSize):
-        instances = []
-        for instance in range(random.randint(minInstances, maxInstances + 1)):
-            features = []
-            for feature in range(0, featuresNumber):
-                features.append(random.random())
-            instances.append(features)
-        dataset.append(instances)
+    #doc = parser.parse(open(filename, 'rb'))
+    #print list(doc)
+    #pprint.pprint(list(doc))
 
-    labels = []
-    for document in range(datasetSize):
-        docLabels = []
-        for label in range(labelsNumber):
-            if(random.random() < 0.5):
-                docLabels.append(-1)
-            else:
-                docLabels.append(+1)
-        labels.append(docLabels)
+    p = prepareMIML.prepareMIML()
+
+    #all_labels = p.read_all_labels()
+    #dictionary = p.create_dictionary()
+
+    #You have to download this data
+    #nltk.download('punkt')
 
 
-    miml = MiMlSVM()
-    miml.train(dataset, labels)
+    #instances = p.get_all_instances()
+    #print len(instances)
 
-    testset = []
-    for document in range(datasetSize):
-        instances = []
-        for instance in range(random.randint(minInstances, maxInstances + 1)):
-            features = []
-            for feature in range(0, featuresNumber):
-                features.append(random.random())
-            instances.append(features)
-        testset.append(instances)
+    matrix = p.get_matrix_instances_labels()
 
-    print miml.test(testset)
+
+    #val = p.read_file(filename)
+    #val = p.read_all_documents()
+    #val = p.read_all_labels_one_file(filename)
+
+    #val = p.read_all_labels()
+    #val2 = p.all_labels()
+
+    #doc = p.get_words_one_file(filename)
+
+    #dictionary_matrix = p.create_dictionary_matrix()
+
