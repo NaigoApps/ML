@@ -8,6 +8,7 @@ import nltk.data
 if __name__ == "__main__":
     # Open the first Reuters data set and create the parser
     filename = "dataset/reut2-000.sgm"
+    filename2 = "dataset/reut2-001.sgm"
     parser = parserFile.ReutersParser()
 
     # Parse the document and force all generated docs into
@@ -18,8 +19,12 @@ if __name__ == "__main__":
 
     p = prepareMIML.prepareMIML()
 
+    p.get_full_matrix_instances_dictionary()
+
+    #p.get_matrix_instances_dictionary_one_document(docs[0][1])
     #all_labels = p.read_all_labels()
     #dictionary = p.create_dictionary()
+    #print len(dictionary)
 
     #You have to download this data
     #nltk.download('punkt')
@@ -28,7 +33,7 @@ if __name__ == "__main__":
     #instances = p.get_all_instances()
     #print len(instances)
 
-    matrix = p.get_matrix_instances_labels()
+    #matrix = p.get_matrix_instances_labels()
 
 
     #val = p.read_file(filename)

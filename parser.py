@@ -1,7 +1,12 @@
 '''
+pM = prepareMIML.prepareMIML()
 
-dictionary = create_dictionary(documents)
-all_labels = read_all_labels()
+#dictionary = create_dictionary(documents)
+dictionary = pM.create_dictionary()
+
+#all_labels = read_all_labels()
+all_labels = pM.read_all_labels()
+
 all_documents = read_all_documents()
 
 foreach document : all_documents

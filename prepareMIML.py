@@ -1,8 +1,12 @@
 import re
+
+import scipy
+
 import parserFile
 import glob
 import numpy as np
 import nltk
+import scipy.sparse as sp
 
 class prepareMIML:
 
@@ -78,6 +82,48 @@ class prepareMIML:
         self.matrix_instances_dictionary = matrix
         return matrix
 
+    def get_matrix_instances_dictionary_one_document(self, document, matrix_name = ""):
+        # returns the matrix where in the row there are all the instances (sentences) of a document
+        # and the columns are all the labels. In a cell [instance][word] there is 1 if the instance contains the word
+
+        if not self.dictionary:
+            self.create_dictionary()
+
+        instances = self.get_instances_from_text(document)
+        N = len(instances)
+        M = len(self.dictionary)
+        m = np.zeros((N, M))
+
+        for i in range(len(instances)):
+            for j in range(len(self.dictionary)):
+                if self.dictionary[j] in instances[i]:
+                    m[i][j] = 1
+
+        matrix = sp.csc_matrix(m)
+
+        self.matrix_instances_dictionary = matrix
+        return matrix
+
+
+    def get_full_matrix_instances_dictionary(self):
+        #returns the matrix where in the row there are all the instances (sentences) of a document
+        #and the columns are all the labels. In a cell [instance][word] there is 1 if the instance contains the word
+
+        if self.matrix_instances_dictionary:
+            return self.matrix_instances_dictionary
+
+        dataset = list()
+        i = 0
+        for filename in glob.glob('dataset/*.sgm'):
+            i+=1
+            print "Elaborazione file: "+filename
+            for document in self.read_file(filename):
+                single_data = self.get_matrix_instances_dictionary_one_document(document[1])
+                dataset += single_data
+            scipy.io.mmwrite("mat_"+str(i)+".mtx",single_data)
+
+        scipy.io.mmwrite("matrix.mtx", dataset)
+
     def create_dictionary(self):
         #scan all document from dataset and create the dictionary with all words
         all_words = set()
@@ -102,7 +148,7 @@ class prepareMIML:
         all_lab = list()
         for filename in glob.glob('dataset/*.sgm'):
             all_lab = all_lab + self.read_all_labels_one_file(filename)
-        self.all_labels = all_lab
+        self.all_labels = list(set(all_lab))
         return list(set(all_lab))
 
     def read_all_labels_one_file(self,filename):
@@ -141,7 +187,7 @@ class prepareMIML:
             all_docs += self.read_file(filename)
         return all_docs
 
-    def read_file(filename):
+    def read_file(self, filename):
         parser = parserFile.ReutersParser()
         doc = parser.parse(open(filename, 'rb'))
         return list(doc)
