@@ -19,9 +19,9 @@ if __name__ == "__main__":
 
     p = prepareMIML.prepareMIML()
 
-    p.get_full_matrix_instances_dictionary()
+    p.get_full_matrix_instances_dictionary_alternative()
+    #p.get_full_matrix_instances_dictionary()
 
-    #p.get_matrix_instances_dictionary_one_document(docs[0][1])
     #all_labels = p.read_all_labels()
     #dictionary = p.create_dictionary()
     #print len(dictionary)
