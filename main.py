@@ -11,6 +11,7 @@ if __name__ == "__main__":
     filename2 = "dataset/reut2-001.sgm"
     parser = parserFile.ReutersParser()
 
+    #ORIGINAL
     # Parse the document and force all generated docs into
     # a list so that it can be printed out to the console
     #doc = parser.parse(open(filename, 'rb'))
@@ -19,31 +20,39 @@ if __name__ == "__main__":
 
     p = prepareMIML.prepareMIML()
 
-    p.get_full_matrix_instances_dictionary_alternative()
-    #p.get_full_matrix_instances_dictionary()
+    #MATRIX
+    #create the matrix instances-dictionary foreach document and foreach file
+        #p.get_full_matrix_instances_dictionary_alternative()
+        #p.get_full_matrix_instances_dictionary()
 
-    #all_labels = p.read_all_labels()
-    #dictionary = p.create_dictionary()
-    #print len(dictionary)
+    #READ FILE
+    #return a matrix where rows are documents (of ONE file) and columns are two: the first with labels and the second with the text
+        #val = p.read_file(filename)
+    #return a matrix as above but from ALL files
+        #val = p.read_all_files()
 
-    #You have to download this data
-    #nltk.download('punkt')
+    #DICTIONARY
+    #return the complete dictionary (all words in ALL files) len: 48377
+        #dictionary = p.create_dictionary()
+    #return all the words from a FILE
+        #words = p.get_words_from_file(filename)
+    #return all the words from a TEXT
+        #words = p.get_words_from_one_document(document)
+
+    #INSTANCES
+    #return all instances from ONE file
+        #instances = p.get_instances_from_file(filename)
+    #return all instances (all sentences from ALL files) len: 123432
+        #instances = p.get_all_instances()
+    #return all instances from a TEXT
+        #instances = p.get_instances_from_text(text)
+
+    #LABELS
+    #return all the labels from ONE file
+        #labels = p.read_all_labels_one_file(filename)
+    #return all the labels from ALL files
+        #all_labels = p.read_all_labels()
 
 
-    #instances = p.get_all_instances()
-    #print len(instances)
-
-    #matrix = p.get_matrix_instances_labels()
-
-
-    #val = p.read_file(filename)
-    #val = p.read_all_documents()
-    #val = p.read_all_labels_one_file(filename)
-
-    #val = p.read_all_labels()
-    #val2 = p.all_labels()
-
-    #doc = p.get_words_one_file(filename)
-
-    #dictionary_matrix = p.create_dictionary_matrix()
-
+    # You have to download this data
+    # nltk.download('punkt')
