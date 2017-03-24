@@ -190,7 +190,7 @@ class prepareMIML:
         all_lab = list()
         for filename in glob.glob('dataset/*.sgm'):
             all_lab = all_lab + self.read_all_labels_one_file(filename)
-        self.all_labels = list(set(all_lab))
+        self.labels = list(set(all_lab))
         return list(set(all_lab))
 
     def read_all_labels_one_file(self, filename):
@@ -219,7 +219,7 @@ class prepareMIML:
         file = open("dataset/all-topics-strings.lc.txt")
         for line in file:
             labels.append(line)
-        self.all_labels = labels
+        self.labels = labels
         return labels
 
     def read_all_files(self):
@@ -266,3 +266,28 @@ class prepareMIML:
         for filename in glob.glob('dataset/*.sgm'):
             array_docs += self.arrayMatrixInstancesDictionaryOneFile(self, filename)
         return array_docs
+
+
+    def matrixDocLabels(self):
+        if not self.labels:
+            self.read_all_labels()
+        N=0
+        for filename in glob.glob('dataset/*.sgm'):
+            docs = self.read_file(filename)
+            N += len(docs)
+        M = len(self.labels)
+        m = np.zeros((N, M))
+        i = 0
+        for filename in glob.glob('dataset/*.sgm'):
+            docs = self.read_file(filename)
+            for doc in docs:
+                for label in doc[0]:
+                    for j, label_from_all in enumerate(self.labels):
+                        if label == label_from_all:
+                            m[i][j] = 1
+                i += 1
+
+        #sparse_matrix = sp.csc_matrix(m)
+        #scipy.io.mmwrite("mat_docs_labels.mtx", sparse_matrix)
+        return m
+
