@@ -56,3 +56,12 @@ if __name__ == "__main__":
 
     # You have to download this data
     # nltk.download('punkt')
+
+    #PROVA
+    # val = p.read_file(filename)
+    # matrix = p.matrixInstancesDictionaryOneDoc(val[0][1])
+    result = list()
+    outputfile = open('array_densematrix_file1.txt', 'w')
+    p.create_dictionary()
+    result = p.arrayMatrixInstancesDictionaryOneFile(filename)
+    print >> outputfile, result

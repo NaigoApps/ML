@@ -132,8 +132,6 @@ class prepareMIML:
         scipy.io.mmwrite("matrix.mtx", dataset)
 
 
-
-
     def get_full_matrix_instances_dictionary_alternative(self):
         # returns the matrix where in the row there are all the instances (sentences) of a document
         # and the columns are all the labels. In a cell [instance][word] there is 1 if the instance contains the word
@@ -234,3 +232,37 @@ class prepareMIML:
         parser = parserFile.ReutersParser()
         doc = parser.parse(open(filename, 'rb'))
         return list(doc)
+
+
+    def sparseMatrixInstancesDictionaryOneDoc(self, document):
+        if not self.dictionary:
+            self.create_dictionary()
+        instances = self.get_instances_from_text(document)
+        N = len(instances)
+        M = len(self.dictionary)
+        m = np.zeros((N, M))
+        print " instances: ",N
+        for i, instance in enumerate(instances):
+            words = self.get_words_from_one_document(instance)
+            for word in words:
+                for j, word_in_dictionary in enumerate(self.dictionary):
+                    if word == word_in_dictionary:
+                        m[i][j] += 1
+        sparse_matrix = sp.csc_matrix(m)
+        #return sparse_matrix
+        return m
+
+    def arrayMatrixInstancesDictionaryOneFile(self, filename):
+        array_docs = list()
+        docs = self.read_file(filename)
+        print "Documents: ",len(docs)
+        for i, doc in enumerate(docs):
+            print "Doc", i, " of ", len(docs),
+            array_docs.append(self.sparseMatrixInstancesDictionaryOneDoc(doc[1]))
+        return array_docs
+
+    def arrayMatrixInstancesDictionary(self):
+        array_docs = list()
+        for filename in glob.glob('dataset/*.sgm'):
+            array_docs += self.arrayMatrixInstancesDictionaryOneFile(self, filename)
+        return array_docs
