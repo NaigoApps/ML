@@ -1,6 +1,7 @@
 import re
 
 import scipy
+import pickle
 
 import parserFile
 import glob
@@ -100,8 +101,8 @@ class prepareMIML:
                     if words == self.dictionary[j]:
                         m[i][j] += 1
 
-        #non funge
-        #for i in range(len(instances)):
+        # non funge
+        # for i in range(len(instances)):
         #    for words in self.get_words_from_one_document(instances[i]):
         #        find = self.dictionary.index(words)
         #        if find:
@@ -123,14 +124,13 @@ class prepareMIML:
         for filename in glob.glob('dataset/*.sgm'):
             i += 1
             print "Elaborazione file: " + filename
-            for j,document in enumerate(self.read_file(filename)):
+            for j, document in enumerate(self.read_file(filename)):
                 print "Doc " + str(j)
                 single_data = self.get_matrix_instances_dictionary_one_document(document[1])
                 dataset += single_data
 
             scipy.io.mmwrite("mat_" + str(i) + ".mtx", single_data)
         scipy.io.mmwrite("matrix.mtx", dataset)
-
 
     def get_full_matrix_instances_dictionary_alternative(self):
         # returns the matrix where in the row there are all the instances (sentences) of a document
@@ -152,10 +152,10 @@ class prepareMIML:
             M = len(self.dictionary)
             m = np.zeros((N, M))
 
-            for i,instance in enumerate(allinstances):
+            for i, instance in enumerate(allinstances):
                 print "Valuto instance " + str(i) + " di " + str(len(allinstances))
                 for word in self.get_words_from_one_document(instance):
-                    for j,word_in_dictionary in enumerate(self.dictionary):
+                    for j, word_in_dictionary in enumerate(self.dictionary):
                         if word == word_in_dictionary:
                             m[i][j] += 1
 
@@ -168,12 +168,46 @@ class prepareMIML:
     def create_dictionary(self):
         # scan all document from dataset and create the dictionary with all words
         print "Creating dictionary..."
+        all_words = {}
+        docs = self.read_all_files()
+        i = 0
+        for doc in docs:
+            for word in self.get_words_from_one_document(doc[1]):
+                if word not in all_words.keys():
+                    all_words[word] = i
+                    print i
+                    i += 1
+        self.dictionary = all_words
+        with open('dictionary.txt', 'w') as fp:
+            pickle.dump(self.dictionary, fp)
+
+        return list(all_words)
+
+    def create_dict_2(self):
+        print "Creating dictionary..."
         all_words = set()
         docs = self.read_all_files()
+        i = 0
         for doc in docs:
-            all_words.update(self.get_words_from_one_document(doc[1]))
-        self.dictionary = list(all_words)
-        return list(all_words)
+            for word in self.get_words_from_one_document(doc[1]):
+                all_words.add(word)
+        dictionary = dict(zip(all_words, list(xrange(len(all_words)))))
+        self.dictionary = dictionary
+        with open('dictionary_2.txt', 'w') as fp:
+            pickle.dump(dictionary, fp)
+        return dictionary
+
+    def get_dictionary_2(self):
+        with open('dictionary_2.txt', 'r') as fp:
+            itemlist = pickle.load(fp)
+        self.dictionary = itemlist
+        return itemlist
+
+    def get_dictionary(self):
+        with open('dictionary.txt', 'r') as fp:
+            itemlist = pickle.load(fp)
+        self.dictionary = itemlist
+        return itemlist
 
     def get_words_from_file(self, filename):
         words = list()
@@ -190,8 +224,17 @@ class prepareMIML:
         all_lab = list()
         for filename in glob.glob('dataset/*.sgm'):
             all_lab = all_lab + self.read_all_labels_one_file(filename)
-        self.labels = list(set(all_lab))
-        return list(set(all_lab))
+        all_lab = list(set(all_lab))
+        self.labels = dict(zip(all_lab, list(xrange(len(all_lab)))))
+        with open('labels.txt', 'w') as fp:
+            pickle.dump(self.labels, fp)
+        return all_lab
+
+    def get_labels(self):
+        with open('labels.txt', 'r') as fp:
+            itemlist = pickle.load(fp)
+        self.labels = itemlist
+        return itemlist
 
     def read_all_labels_one_file(self, filename):
         # read and returns all label from a document
@@ -233,7 +276,6 @@ class prepareMIML:
         doc = parser.parse(open(filename, 'rb'))
         return list(doc)
 
-
     def sparseMatrixInstancesDictionaryOneDoc(self, document):
         if not self.dictionary:
             self.create_dictionary()
@@ -241,24 +283,52 @@ class prepareMIML:
         N = len(instances)
         M = len(self.dictionary)
         m = np.zeros((N, M))
-        print " instances: ",N
+        # m *= -1
+        print " instances: ", N
         for i, instance in enumerate(instances):
             words = self.get_words_from_one_document(instance)
             for word in words:
-                for j, word_in_dictionary in enumerate(self.dictionary):
-                    if word == word_in_dictionary:
-                        m[i][j] += 1
+                if self.dictionary.has_key(word):
+                    m[i][self.dictionary[word]] += 1
+                    # for j, word_in_dictionary in enumerate(self.dictionary):
+                    #     if word == word_in_dictionary:
+                    #         m[i][j] += 1
         sparse_matrix = sp.csc_matrix(m)
-        #return sparse_matrix
+        return sparse_matrix
+        # return m
+
+    def denseMatrixInstancesDictionaryOneDoc(self, document):
+        if not self.dictionary:
+            self.create_dictionary()
+        instances = self.get_instances_from_text(document)
+        N = len(instances)
+        M = len(self.dictionary)
+        m = np.zeros((N, M))
+        # m *= -1
+        print " instances: ", N
+        for i, instance in enumerate(instances):
+            words = self.get_words_from_one_document(instance)
+            for word in words:
+                if self.dictionary.has_key(word):
+                    m[i][self.dictionary[word]] += 1
         return m
 
     def arrayMatrixInstancesDictionaryOneFile(self, filename):
         array_docs = list()
         docs = self.read_file(filename)
-        print "Documents: ",len(docs)
+        print "Documents: ", len(docs)
         for i, doc in enumerate(docs):
             print "Doc", i, " of ", len(docs),
             array_docs.append(self.sparseMatrixInstancesDictionaryOneDoc(doc[1]))
+        return array_docs
+
+    def arrayMatrixInstancesDictionaryOneFileDense(self, filename):
+        array_docs = list()
+        docs = self.read_file(filename)
+        print "Documents: ", len(docs)
+        for i, doc in enumerate(docs):
+            print "Doc", i, " of ", len(docs),
+            array_docs.append(self.denseMatrixInstancesDictionaryOneDoc(doc[1]))
         return array_docs
 
     def arrayMatrixInstancesDictionary(self):
@@ -267,11 +337,24 @@ class prepareMIML:
             array_docs += self.arrayMatrixInstancesDictionaryOneFile(self, filename)
         return array_docs
 
+    def matrixDocLabelsOneFile(self, filename):
+        if not self.labels:
+            self.get_labels()
+        docs = self.read_file(filename)
+        N = len(docs)
+        M = len(self.labels)
+        m = np.zeros((N, M))
+
+        for i, doc in enumerate(docs):
+            for label in doc[0]:
+                if self.labels.has_key(label):
+                    m[i][self.labels[label]] += 1
+        return m
 
     def matrixDocLabels(self):
         if not self.labels:
-            self.read_all_labels()
-        N=0
+            self.get_labels()
+        N = 0
         for filename in glob.glob('dataset/*.sgm'):
             docs = self.read_file(filename)
             N += len(docs)
@@ -282,12 +365,7 @@ class prepareMIML:
             docs = self.read_file(filename)
             for doc in docs:
                 for label in doc[0]:
-                    for j, label_from_all in enumerate(self.labels):
-                        if label == label_from_all:
-                            m[i][j] = 1
+                    if self.labels.has_key(label):
+                        m[i][self.labels[label]] += 1
                 i += 1
-
-        #sparse_matrix = sp.csc_matrix(m)
-        #scipy.io.mmwrite("mat_docs_labels.mtx", sparse_matrix)
         return m
-

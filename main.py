@@ -1,9 +1,25 @@
+import pickle
+import numpy as np
+import scipy.sparse as sp
+from sys import getsizeof
 import time
 
 import parserFile
 import prepareMIML
 import nltk
 import nltk.data
+
+
+def save_sparse_csc(filename, array):
+    np.savez(filename, data=array.data, indices=array.indices,
+             indptr=array.indptr, shape=array.shape)
+
+
+def load_sparse_csr(filename):
+    loader = np.load(filename)
+    return sp.csc_matrix((loader['data'], loader['indices'], loader['indptr']),
+                      shape=loader['shape'])
+
 
 if __name__ == "__main__":
     # Open the first Reuters data set and create the parser
@@ -60,8 +76,37 @@ if __name__ == "__main__":
     #PROVA
     # val = p.read_file(filename)
     # matrix = p.matrixInstancesDictionaryOneDoc(val[0][1])
-    result = list()
-    outputfile = open('array_densematrix_file1.txt', 'w')
-    p.create_dictionary()
-    result = p.arrayMatrixInstancesDictionaryOneFile(filename)
-    print >> outputfile, result
+
+    #p.matrixDocLabels() #create the matrix Documents-Labels
+    p.get_dictionary_2()
+    #sparse_matrix = p.arrayMatrixInstancesDictionaryOneFile(filename)
+    dense_matrix = p.arrayMatrixInstancesDictionaryOneFileDense(filename)
+
+    print dense_matrix[3] #matrice instanza dizionario del documento 3
+    print dense_matrix[3][2] #dizionario dell'instanza 2 del doc 3
+    print dense_matrix[3][2][1] #parola 1 dell'instanza 2 del documento 3
+    print sum(dense_matrix[2][1]) #numero di parola nell'instanza 1 doc 2
+    print ""
+
+    labels_matrix = p.matrixDocLabelsOneFile(filename)
+    print labels_matrix #matrice documento label
+    print labels_matrix[0] #tutte le label del doc 1
+    print labels_matrix[0][1] #label 1 del documento 0
+    print sum(labels_matrix[0]) #numero di labels del doc 0
+
+    #solo se matrice densa
+    # print len(result) #numero di documenti (1000 solo nel primo file)
+    # print len(result[0]) #numero di instanze del documento 0 -> 21
+    # print len(result[0][0]) #numero di parole del dizionario -> 48377
+    # print sum(result[0][0]) #numero di parole nell'instanza 0 -> 38
+
+
+    #save_sparse_csc('array_of_matrix_doc_dictionary_file1',result[0])
+    #matrix = load_sparse_csc('array_of_matrix_doc_dictionary_file1.npz')
+    #matrix.todense()
+
+
+    # p.create_dictionary()
+    # result = p.matrixDocLabels()
+
+
