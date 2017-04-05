@@ -8,6 +8,7 @@ import parserFile
 import prepareMIML
 import nltk
 import nltk.data
+import miml_svm
 
 
 def save_sparse_csc(filename, array):
@@ -80,18 +81,20 @@ if __name__ == "__main__":
     #p.matrixDocLabels() #create the matrix Documents-Labels
     p.get_dictionary_2()
     #sparse_matrix = p.arrayMatrixInstancesDictionaryOneFile(filename)
-    dense_matrix = p.arrayMatrixInstancesDictionaryOneFileDense(filename)
+    dense_matrix, excluded_docs = p.arrayMatrixInstancesDictionaryOneFileDense(filename)
 
-    print dense_matrix[3] #matrice instanza dizionario del documento 3
-    print dense_matrix[3][2] #dizionario dell'instanza 2 del doc 3
-    print dense_matrix[3][2][1] #parola 1 dell'instanza 2 del documento 3
+    # print dense_matrix[3] #matrice instanza dizionario del documento 3
+    # print dense_matrix[3][2] #dizionario dell'instanza 2 del doc 3
+    # print dense_matrix[3][2][1] #parola 1 dell'instanza 2 del documento 3
+    print "Words second doc, first phrase"
     print sum(dense_matrix[2][1]) #numero di parola nell'instanza 1 doc 2
     print ""
 
-    labels_matrix = p.matrixDocLabelsOneFile(filename)
-    print labels_matrix #matrice documento label
-    print labels_matrix[0] #tutte le label del doc 1
-    print labels_matrix[0][1] #label 1 del documento 0
+    labels_matrix = p.matrixDocLabelsOneFile(filename, excluded_docs)
+    # print labels_matrix #matrice documento label
+    # print labels_matrix[0] #tutte le label del doc 1
+    # print labels_matrix[0][1] #label 1 del documento 0
+    print "Labels first doc"
     print sum(labels_matrix[0]) #numero di labels del doc 0
 
     #solo se matrice densa
@@ -109,4 +112,19 @@ if __name__ == "__main__":
     # p.create_dictionary()
     # result = p.matrixDocLabels()
 
+    svm = miml_svm.MiMlSVM()
 
+    training_data = dense_matrix[0 : len(dense_matrix) * 9 / 10]
+    test_data = dense_matrix[len(dense_matrix) * 9 / 10 : len(dense_matrix)]
+
+
+    training_labels = labels_matrix[0 : len(dense_matrix) * 9 / 10]
+    test_labels = labels_matrix[len(dense_matrix) * 9 / 10 : len(dense_matrix)]
+
+    print "Training:"
+    svm.train(training_data, training_labels)
+    print "Testing:"
+    predictions = svm.test(test_data)
+
+    for i, prediction in enumerate(predictions):
+        print np.array(test_labels[i]) - np.array(prediction)

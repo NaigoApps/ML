@@ -324,12 +324,17 @@ class prepareMIML:
 
     def arrayMatrixInstancesDictionaryOneFileDense(self, filename):
         array_docs = list()
+        excluded_docs = []
         docs = self.read_file(filename)
         print "Documents: ", len(docs)
         for i, doc in enumerate(docs):
             print "Doc", i, " of ", len(docs),
-            array_docs.append(self.denseMatrixInstancesDictionaryOneDoc(doc[1]))
-        return array_docs
+            instances = self.denseMatrixInstancesDictionaryOneDoc(doc[1])
+            if len(instances) > 0:
+                array_docs.append(instances)
+            else:
+                excluded_docs.append(i)
+        return array_docs, excluded_docs
 
     def arrayMatrixInstancesDictionary(self):
         array_docs = list()
@@ -337,7 +342,7 @@ class prepareMIML:
             array_docs += self.arrayMatrixInstancesDictionaryOneFile(self, filename)
         return array_docs
 
-    def matrixDocLabelsOneFile(self, filename):
+    def matrixDocLabelsOneFile(self, filename, excluded_docs):
         if not self.labels:
             self.get_labels()
         docs = self.read_file(filename)
@@ -346,9 +351,10 @@ class prepareMIML:
         m = np.zeros((N, M))
 
         for i, doc in enumerate(docs):
-            for label in doc[0]:
-                if self.labels.has_key(label):
-                    m[i][self.labels[label]] += 1
+            if i not in excluded_docs:
+                for label in doc[0]:
+                    if self.labels.has_key(label):
+                        m[i][self.labels[label]] += 1
         return m
 
     def matrixDocLabels(self):
