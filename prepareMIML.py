@@ -315,12 +315,17 @@ class prepareMIML:
 
     def arrayMatrixInstancesDictionaryOneFile(self, filename):
         array_docs = list()
+        excluded_docs = []
         docs = self.read_file(filename)
         print "Documents: ", len(docs)
         for i, doc in enumerate(docs):
             print "Doc", i, " of ", len(docs),
-            array_docs.append(self.sparseMatrixInstancesDictionaryOneDoc(doc[1]))
-        return array_docs
+            instances = self.sparseMatrixInstancesDictionaryOneDoc(doc[1])
+            if instances.shape[0] > 0:
+                array_docs.append(instances)
+            else:
+                excluded_docs.append(i)
+        return array_docs, excluded_docs
 
     def arrayMatrixInstancesDictionaryOneFileDense(self, filename):
         array_docs = list()

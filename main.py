@@ -80,15 +80,19 @@ if __name__ == "__main__":
 
     #p.matrixDocLabels() #create the matrix Documents-Labels
     p.get_dictionary_2()
-    #sparse_matrix = p.arrayMatrixInstancesDictionaryOneFile(filename)
-    dense_matrix, excluded_docs = p.arrayMatrixInstancesDictionaryOneFileDense(filename)
+    vector_of_sparse_matrix, excluded_docs = p.arrayMatrixInstancesDictionaryOneFile(filename)
+    #dense_matrix, excluded_docs = p.arrayMatrixInstancesDictionaryOneFileDense(filename)
 
     # print dense_matrix[3] #matrice instanza dizionario del documento 3
     # print dense_matrix[3][2] #dizionario dell'instanza 2 del doc 3
     # print dense_matrix[3][2][1] #parola 1 dell'instanza 2 del documento 3
     print "Words second doc, first phrase"
-    print sum(dense_matrix[2][1]) #numero di parola nell'instanza 1 doc 2
+    #print sum(dense_matrix[6][2]) #numero di parole nell'instanza 1 doc 2
     print ""
+
+
+    print sum(vector_of_sparse_matrix[6][2].data)
+
 
     labels_matrix = p.matrixDocLabelsOneFile(filename, excluded_docs)
     # print labels_matrix #matrice documento label
@@ -114,17 +118,27 @@ if __name__ == "__main__":
 
     svm = miml_svm.MiMlSVM()
 
-    training_data = dense_matrix[0 : len(dense_matrix) * 9 / 10]
-    test_data = dense_matrix[len(dense_matrix) * 9 / 10 : len(dense_matrix)]
+    #training_data = dense_matrix[0 : len(dense_matrix) * 9 / 10]
+    #test_data = dense_matrix[len(dense_matrix) * 9 / 10 : len(dense_matrix)]
+
+    training_data_sparse = vector_of_sparse_matrix[0: len(vector_of_sparse_matrix) * 9 / 10]
+    test_data_sparse = vector_of_sparse_matrix[len(vector_of_sparse_matrix) * 9 / 10: len(vector_of_sparse_matrix)]
 
 
-    training_labels = labels_matrix[0 : len(dense_matrix) * 9 / 10]
-    test_labels = labels_matrix[len(dense_matrix) * 9 / 10 : len(dense_matrix)]
+    # training_labels = labels_matrix[0 : len(dense_matrix) * 9 / 10]
+    # test_labels = labels_matrix[len(dense_matrix) * 9 / 10 : len(dense_matrix)]
+
+    training_labels = labels_matrix[0: len(vector_of_sparse_matrix) * 9 / 10]
+    test_labels = labels_matrix[len(vector_of_sparse_matrix) * 9 / 10: len(vector_of_sparse_matrix)]
 
     print "Training:"
-    svm.train(training_data, training_labels)
+    #svm.train(training_data_sparse, training_labels)
+
+    svm.train_sparse(training_data_sparse, training_labels)
     print "Testing:"
-    predictions = svm.test(test_data)
+    #predictions = svm.test(test_data)
+
+    predictions = svm.test(test_data_sparse)
 
     for i, prediction in enumerate(predictions):
         print np.array(test_labels[i]) - np.array(prediction)
