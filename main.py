@@ -1,6 +1,7 @@
 import pickle
 import numpy as np
 import scipy.sparse as sp
+import sys
 from sys import getsizeof
 import time
 
@@ -35,7 +36,11 @@ if __name__ == "__main__":
     #print list(doc)
     #pprint.pprint(list(doc))
 
-    p = prepareMIML.prepareMIML()
+    if(len(sys.argv) == 2):
+        config_file = sys.argv[1]
+    else:
+        config_file = None
+    p = prepareMIML.prepareMIML(config_file)
 
     #MATRIX
     #create the matrix instances-dictionary foreach document and foreach file
@@ -79,9 +84,9 @@ if __name__ == "__main__":
     # matrix = p.matrixInstancesDictionaryOneDoc(val[0][1])
 
     #p.matrixDocLabels() #create the matrix Documents-Labels
-    p.get_dictionary_2()
+    # p.get_dictionary_2()
     #sparse_matrix = p.arrayMatrixInstancesDictionaryOneFile(filename)
-    dense_matrix, excluded_docs = p.arrayMatrixInstancesDictionaryOneFileDense(filename)
+    dataset = p.arrayMatrixInstancesDictionaryOneFile(filename)
 
     # print dense_matrix[3] #matrice instanza dizionario del documento 3
     # print dense_matrix[3][2] #dizionario dell'instanza 2 del doc 3
@@ -111,6 +116,11 @@ if __name__ == "__main__":
 
     # p.create_dictionary()
     # result = p.matrixDocLabels()
+
+    # for d, document in enumerate(dense_matrix):
+    #     dense_matrix[d] = sp.dok_matrix(document)
+        # for i, instance in enumerate(document):
+        #     document[i] = sp.dok_matrix(instance)
 
     svm = miml_svm.MiMlSVM()
 

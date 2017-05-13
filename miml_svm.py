@@ -1,5 +1,5 @@
 import misvm
-import numpy
+import numpy as np
 import time
 import gc
 
@@ -11,14 +11,14 @@ class MiMlSVM:
         self.SVMs = []
         index = 0
         glob_start = time.time()
-        for label in numpy.transpose(labels):
+        for label in np.transpose(labels):
             # classifier = misvm.MISVM(kernel='linear', C=1.0, max_iters=50)
             start = time.time()
             classifier = misvm.SIL(kernel='linear', C=1.0)
-            classifier.fit(dataset, label)
+            classifier.fit(dataset, np.array(label))
             self.SVMs.append(classifier)
             index += 1
-            print "Trained " + str(index) + " of " + str(len(numpy.transpose(labels))) + " in " + str(int(time.time()) - int(start)) + " sec"
+            print "Trained " + str(index) + " of " + str(len(np.transpose(labels))) + " in " + str(int(time.time()) - int(start)) + " sec"
             gc.collect()
         print "It took " + str((int(time.time()) - int(glob_start))/60) + " minutes"
 
@@ -29,4 +29,4 @@ class MiMlSVM:
             all_labels.append(SVM.predict(test_set))
             index += 1
             print "Tested " + str(index) + " labels of " + str(len(self.SVMs))
-        return numpy.transpose(all_labels)
+        return np.transpose(all_labels)
