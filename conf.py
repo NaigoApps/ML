@@ -4,4 +4,5 @@ min_occurrences = 5
 keep_dictionary = "y"
 remove_short_docs = "y"
 show_documents_hist = "n"
-min_words = 10
+min_instances = 3
+min_word_occurrences = 5

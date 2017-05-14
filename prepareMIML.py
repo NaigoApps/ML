@@ -3,6 +3,7 @@ import re
 import scipy
 import pickle
 
+import time
 import sys
 import os
 import parserFile
@@ -27,6 +28,8 @@ class prepareMIML:
     # matrix_document_labels = np.matrix(1,2) #? utile?
 
     def __init__(self, use_conf):
+        self.dictionary = []
+        self.documents = []
         self.use_conf = use_conf
         self.STOPWORDS_FILE = "stopwords.txt"
 
@@ -37,7 +40,8 @@ class prepareMIML:
         return
 
     def log(self, msg):
-        logging.info(msg)
+        # logging.info(msg)
+        print msg
 
     def get_all_instances(self):
         # returns all the instances from all files in the dataset (all the sentences)
@@ -55,6 +59,7 @@ class prepareMIML:
             instances += self.get_instances_from_text(document[1])
         return instances
 
+    #used
     def get_instances_from_text(self, text):
         # returns all the instances from a text document as a list (all the sentences of a text document)
         sentences = nltk.sent_tokenize(text)
@@ -85,7 +90,7 @@ class prepareMIML:
 
         if self.matrix_instances_dictionary:
             return self.matrix_instances_dictionary
-        if (not self.instances):
+        if not self.instances:
             self.get_all_instances()
         # if(not self.dictionary):
         #    self.create_dictionary()
@@ -183,12 +188,11 @@ class prepareMIML:
         scipy.io.mmwrite("matrix.mtx", dataset)
 
     # used
-    def create_dictionary(self, filename=None):
+    def create_dictionary(self):
         # scan all document from dataset and create the dictionary with all words
         all_words = {}
 
         print "Creating dictionary..."
-        new_counter = 0
         counter = 0
         dictionary_growth = []
         total_words = 0
@@ -204,8 +208,7 @@ class prepareMIML:
                     self.progress("%.2f" % (float(100 * counter) / total_words) + "%")
                 if word not in all_words.keys():
                     dictionary_growth[d] += 1
-                    all_words[word] = [new_counter, 1]
-                    new_counter += 1
+                    all_words[word] = [-1, 1]
                 else:
                     all_words[word][1] += 1
 
@@ -215,7 +218,7 @@ class prepareMIML:
 
         self.dictionary = all_words
 
-        #Remove stopwords
+        # Remove stopwords
         if not self.use_conf:
             choice = raw_input("Want to remove stopwords? (y/n) - ")
         else:
@@ -223,7 +226,7 @@ class prepareMIML:
         if (choice == "y"):
             self.remove_stopwords()
 
-        #Remove rare words
+        # Remove rare words
         if not self.use_conf:
             choice = raw_input("Want to remove rare words? (y/n) - ")
         else:
@@ -235,6 +238,11 @@ class prepareMIML:
             pickle.dump(dictionary_growth, fp)
         with open('dictionary.txt', 'w') as fp:
             pickle.dump(self.dictionary, fp)
+
+        counter = 0
+        for key in all_words:
+            all_words[key][0] = counter
+            counter += 1
 
         return list(all_words)
 
@@ -248,8 +256,7 @@ class prepareMIML:
             for word in stopwords:
                 if self.dictionary.has_key(word):
                     del self.dictionary[word]
-            print "Removed " + str(oldsize - len(self.dictionary)) + " words"
-            logging.info("Removed " + str(oldsize - len(self.dictionary)) + " words")
+            self.log("Removed " + str(oldsize - len(self.dictionary)) + " words")
         else:
             print "There is no stopword file \"" + self.STOPWORDS_FILE + "\""
 
@@ -259,6 +266,18 @@ class prepareMIML:
         word_occurrences = [data[1] for word, data in self.dictionary.iteritems()]
         pyplot.hist(word_occurrences, bins=range(1, np.max(word_occurrences)))
         pyplot.show()
+
+        min_occurrences = 0
+        if self.use_conf:
+            min_occurrences = conf.min_word_occurrences
+        else:
+            min_occurrences = int(raw_input("Enter minimum number of occurrences - "))
+
+        self.log("Deleting words with less than " + str(min_occurrences) + " occurrences")
+        old_length = len(self.dictionary)
+        self.dictionary = {word:data for word, data in self.dictionary.iteritems() if data[1] >= min_occurrences}
+        self.log("Removed " + str(old_length - len(self.dictionary)) + " rare words")
+
 
     def create_dict_2(self):
         print "Creating dictionary..."
@@ -286,8 +305,7 @@ class prepareMIML:
             self.documents = self.read_all_files()
         else:
             self.documents = self.read_file(filename)
-
-        if (not self.use_conf):
+        if not self.use_conf:
             choice = raw_input("Want to remove short documents? (y/n) - ")
         else:
             choice = conf.remove_short_docs
@@ -296,32 +314,35 @@ class prepareMIML:
             self.remove_short_documents()
 
     def remove_short_documents(self):
-        lengths = [len(doc['words']) for doc in self.documents]
-        if (not self.use_conf or conf.show_documents_hist == "y"):
+        lengths = [len(doc['instances']) for doc in self.documents]
+        if not self.use_conf or conf.show_documents_hist == "y":
             pyplot.hist(lengths, bins=range(0, np.max(lengths) + 1))
+            pyplot.xlabel("Number of phrases")
+            pyplot.ylabel("Number of documents")
             pyplot.show()
 
-        min_words = 0
-        if (self.use_conf):
-            min_words = conf.min_words
+            min_instances = 0
+        if self.use_conf:
+            min_instances = conf.min_instances
         else:
-            min_words = int(raw_input("Enter minimum number of words - "))
-        self.log("Deleting documents with less than " + str(min_words) + " words")
+            min_instances = int(raw_input("Enter minimum number of phrases - "))
+
+        self.log("Deleting documents with less than " + str(min_instances) + " phrases")
         old_length = len(self.documents)
-        self.documents = [doc for doc in self.documents if len(doc['words']) >= min_words]
+        self.documents = [doc for doc in self.documents if len(doc['instances']) >= min_instances]
         self.log("Removed " + str(old_length - len(self.documents)) + " short documents")
 
     # used
     def init_dictionary(self):
         create = False
-        if (os.path.isfile("dictionary.txt")):
+        if os.path.isfile("dictionary.txt"):
 
-            if (not self.use_conf):
+            if not self.use_conf:
                 choice = raw_input("Dictionary already exists, use that? (y/n) - ")
             else:
                 choice = conf.keep_dictionary
 
-            if (choice == "n"):
+            if choice == "n":
                 create = True
         else:
             create = True
@@ -418,10 +439,17 @@ class prepareMIML:
     def read_file(self, filename):
         parser = parserFile.ReutersParser()
         docs = parser.parse(open(filename, 'rb'))
-        return [{'text': doc[1], 'words': re.compile('\w+').findall(doc[1]), 'labels': doc[0]} for doc in list(docs)]
+        return [
+            {
+                'text': doc[1],
+                'words': re.compile('\w+').findall(doc[1]),
+                'instances': self.get_instances_from_text(doc[1]),
+                'labels': doc[0]
+            }
+            for doc in list(docs)
+            ]
 
-    def sparseMatrixInstancesDictionaryOneDoc(self, document):
-        instances = self.get_instances_from_text(document)
+    def sparseMatrixInstancesDictionaryOneDoc(self, instances):
         N = len(instances)
         M = len(self.dictionary)
         m = []
@@ -432,7 +460,8 @@ class prepareMIML:
             if (len(words) > 0):
                 instance = np.zeros((M))
                 for word in words:
-                    instance[self.dictionary[word]] += 1
+                    if self.dictionary.has_key(word):
+                        instance[self.dictionary[word][0]] += 1
                     # SPARSE DICTIONARY WAY
                     # if self.dictionary.has_key(word):
                     #     if(m[i].has_key(self.dictionary[word])):
@@ -468,17 +497,11 @@ class prepareMIML:
         self.init_documents(filename)
         self.init_dictionary()
         array_docs = list()
-        excluded_docs = []
-        docs = self.read_file(filename)
-        self.log("Found " + str(len(docs)) + " documents")
-        for i, doc in enumerate(docs):
-            print "Doc", i, " of ", len(docs),
-            instances = self.sparseMatrixInstancesDictionaryOneDoc(doc['text'])
-            if instances.shape[0] > 0 and instances.shape[1] > 0:
-                array_docs.append(instances)
-            else:
-                excluded_docs.append(i)
-        return array_docs, excluded_docs
+        self.log("Found " + str(len(self.documents)) + " documents")
+        for i, doc in enumerate(self.documents):
+            print "Doc", i, " of ", len(self.documents),
+            instances = self.sparseMatrixInstancesDictionaryOneDoc(doc['instances'])
+        return array_docs
 
     def arrayMatrixInstancesDictionaryOneFileDense(self, filename):
         array_docs = list()
