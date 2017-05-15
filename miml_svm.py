@@ -19,7 +19,6 @@ class MiMlSVM:
             self.SVMs.append(classifier)
             index += 1
             print "Trained " + str(index) + " of " + str(len(np.transpose(labels))) + " in " + str(int(time.time()) - int(start)) + " sec"
-            gc.collect()
         print "It took " + str((int(time.time()) - int(glob_start))/60) + " minutes"
 
     def test(self, test_set):
@@ -29,4 +28,4 @@ class MiMlSVM:
             all_labels.append(SVM.predict(test_set))
             index += 1
             print "Tested " + str(index) + " labels of " + str(len(self.SVMs))
-        return np.transpose(all_labels)
+        return np.sign(np.transpose(all_labels))

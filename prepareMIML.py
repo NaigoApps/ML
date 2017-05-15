@@ -528,7 +528,7 @@ class prepareMIML:
         first = True
         for doc in self.documents:
             for label in doc['labels']:
-                if label == 'usa' and not self.labels.has_key(label):
+                if label == 'cocoa' and not self.labels.has_key(label):
                     self.labels[label] = counter
                     counter += 1
                     first = False
