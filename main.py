@@ -95,7 +95,7 @@ if __name__ == "__main__":
     # print sum(dense_matrix[2][1]) #numero di parola nell'instanza 1 doc 2
     # print ""
 
-    # labels_matrix = p.matrixDocLabelsOneFile(filename, excluded_docs)
+    labels = p.matrixDocLabelsOneFile()
     # print labels_matrix #matrice documento label
     # print labels_matrix[0] #tutte le label del doc 1
     # print labels_matrix[0][1] #label 1 del documento 0
@@ -128,13 +128,13 @@ if __name__ == "__main__":
     test_data = dataset[len(dataset) * 9 / 10 : len(dataset)]
 
 
-    training_labels = labels_matrix[0 : len(dataset) * 9 / 10]
-    test_labels = labels_matrix[len(dataset) * 9 / 10 : len(dataset)]
+    # training_labels = labels[0 : len(dataset) * 9 / 10]
+    # test_labels = labels[len(dataset) * 9 / 10 : len(dataset)]
 
     print "Training:"
-    svm.train(training_data, training_labels)
+    svm.train(training_data, labels)
     print "Testing:"
     predictions = svm.test(test_data)
 
     for i, prediction in enumerate(predictions):
-        print np.array(test_labels[i]) - np.array(prediction)
+        print np.array(prediction)

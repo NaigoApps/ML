@@ -59,7 +59,7 @@ class prepareMIML:
             instances += self.get_instances_from_text(document[1])
         return instances
 
-    #used
+    # used
     def get_instances_from_text(self, text):
         # returns all the instances from a text document as a list (all the sentences of a text document)
         sentences = nltk.sent_tokenize(text)
@@ -234,17 +234,17 @@ class prepareMIML:
         if (choice == "y"):
             self.remove_rare_words()
 
+        counter = 0
+        for key in self.dictionary:
+            self.dictionary[key][0] = counter
+            counter += 1
+
         with open('dictionary_stat.txt', 'w') as fp:
             pickle.dump(dictionary_growth, fp)
         with open('dictionary.txt', 'w') as fp:
             pickle.dump(self.dictionary, fp)
 
-        counter = 0
-        for key in all_words:
-            all_words[key][0] = counter
-            counter += 1
-
-        return list(all_words)
+        return self.dictionary
 
     def remove_stopwords(self):
         if os.path.isfile(self.STOPWORDS_FILE):
@@ -275,9 +275,8 @@ class prepareMIML:
 
         self.log("Deleting words with less than " + str(min_occurrences) + " occurrences")
         old_length = len(self.dictionary)
-        self.dictionary = {word:data for word, data in self.dictionary.iteritems() if data[1] >= min_occurrences}
+        self.dictionary = {word: data for word, data in self.dictionary.iteritems() if data[1] >= min_occurrences}
         self.log("Removed " + str(old_length - len(self.dictionary)) + " rare words")
-
 
     def create_dict_2(self):
         print "Creating dictionary..."
@@ -454,7 +453,6 @@ class prepareMIML:
         M = len(self.dictionary)
         m = []
         # m *= -1
-        print " instances: ", N
         for i, instance in enumerate(instances):
             words = self.get_words_from_one_document(instance)
             if (len(words) > 0):
@@ -462,16 +460,16 @@ class prepareMIML:
                 for word in words:
                     if self.dictionary.has_key(word):
                         instance[self.dictionary[word][0]] += 1
-                    # SPARSE DICTIONARY WAY
-                    # if self.dictionary.has_key(word):
-                    #     if(m[i].has_key(self.dictionary[word])):
-                    #         m[i][self.dictionary[word]] = m[i][self.dictionary[word]] + 1
-                    #     else:
-                    #         m[i][self.dictionary[word]] = 1
+                        # SPARSE DICTIONARY WAY
+                        # if self.dictionary.has_key(word):
+                        #     if(m[i].has_key(self.dictionary[word])):
+                        #         m[i][self.dictionary[word]] = m[i][self.dictionary[word]] + 1
+                        #     else:
+                        #         m[i][self.dictionary[word]] = 1
 
-                    # for j, word_in_dictionary in enumerate(self.dictionary):
-                    #     if word == word_in_dictionary:
-                    #         m[i][j] += 1
+                        # for j, word_in_dictionary in enumerate(self.dictionary):
+                        #     if word == word_in_dictionary:
+                        #         m[i][j] += 1
                 m.append(instance)
         return sp.csr_matrix(np.asmatrix(m))
         # return m
@@ -496,11 +494,12 @@ class prepareMIML:
     def arrayMatrixInstancesDictionaryOneFile(self, filename):
         self.init_documents(filename)
         self.init_dictionary()
-        array_docs = list()
+        array_docs = []
         self.log("Found " + str(len(self.documents)) + " documents")
         for i, doc in enumerate(self.documents):
-            print "Doc", i, " of ", len(self.documents),
+            self.progress("Doc " + str(i + 1) + " of " + str(len(self.documents)))
             instances = self.sparseMatrixInstancesDictionaryOneDoc(doc['instances'])
+            array_docs.append(instances)
         return array_docs
 
     def arrayMatrixInstancesDictionaryOneFileDense(self, filename):
@@ -523,23 +522,27 @@ class prepareMIML:
             array_docs += self.arrayMatrixInstancesDictionaryOneFile(self, filename)
         return array_docs
 
-    def matrixDocLabelsOneFile(self, filename, excluded_docs):
-        if not self.labels:
-            self.get_labels()
-        docs = self.read_file(filename)
-        N = len(docs)
+    def matrixDocLabelsOneFile(self):
+        self.labels = {}
+        counter = 0
+        first = True
+        for doc in self.documents:
+            for label in doc['labels']:
+                if label == 'usa' and not self.labels.has_key(label):
+                    self.labels[label] = counter
+                    counter += 1
+                    first = False
+
+        N = len(self.documents)
         M = len(self.labels)
         m = []
 
-        for i, doc in enumerate(docs):
-            if i not in excluded_docs:
-                labels = np.zeros((M))
-                for i in range(len(labels)):
-                    labels[i] = -1
-                for label in doc[0]:
-                    if self.labels.has_key(label):
-                        labels[self.labels[label]] = 1
-                    m.append(labels)
+        for i, doc in enumerate(self.documents):
+            labels = -1 * np.ones((M))
+            for label in doc['labels']:
+                if self.labels.has_key(label):
+                    labels[self.labels[label]] = 1
+            m.append(labels)
         return m
 
     def matrixDocLabels(self):
