@@ -500,6 +500,7 @@ class prepareMIML:
             self.progress("Doc " + str(i + 1) + " of " + str(len(self.documents)))
             instances = self.sparseMatrixInstancesDictionaryOneDoc(doc['instances'])
             array_docs.append(instances)
+        self.log("")
         return array_docs
 
     def arrayMatrixInstancesDictionaryOneFileDense(self, filename):
@@ -524,14 +525,36 @@ class prepareMIML:
 
     def matrixDocLabelsOneFile(self):
         self.labels = {}
+        all_labels = {}
         counter = 0
         first = True
         for doc in self.documents:
             for label in doc['labels']:
-                if label == 'cocoa' and not self.labels.has_key(label):
+                #if label == 'usa': #da rimuovere
+                if not self.labels.has_key(label):
                     self.labels[label] = counter
                     counter += 1
-                    first = False
+                    all_labels[label] = [-1, 1]
+                else:
+                    all_labels[label][1] += 1
+
+        #we use only the 20% most frequent labels
+        top_labels = {}
+        counter = 0
+        for percent in range(0, int(len(self.labels)/5)):
+            best = 0
+            best_label = ""
+            for label in self.labels:
+                if all_labels[label][1] > best and not top_labels.has_key(label):
+                    best = all_labels[label][1]
+                    best_label = label
+            #all_labels[best_label][0] = 1
+            top_labels[best_label] = counter
+            counter += 1
+
+        self.log("Selected " + str(len(top_labels)) + " labels from " + str(len(self.labels)))
+        self.labels = top_labels
+
 
         N = len(self.documents)
         M = len(self.labels)

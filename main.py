@@ -128,60 +128,69 @@ if __name__ == "__main__":
     precisions = []
     recalls = []
 
-    for percent in range(1, 10):
-        training_data = dataset[0 : len(dataset) * percent / 10]
-        test_data = dataset[len(dataset) * percent / 10 : len(dataset)]
+    training_data = dataset[0: len(dataset) * 6 / 10]
+    test_data = dataset[len(dataset) * 6 / 10: len(dataset)]
 
-        print "Training with ", len(training_data), " documents"
-        print "Testing with ", len(test_data), " documents"
+    print "Training:"
+    svm = miml_svm.MiMlSVM()
+    svm.train(training_data, labels)
+    print "Testing:"
+    predictions = svm.test(test_data)
 
-        # training_labels = labels[0 : len(dataset) * 9 / 10]
-        # test_labels = labels[len(dataset) * 9 / 10 : len(dataset)]
-
-        print "Training:"
-        svm = miml_svm.MiMlSVM()
-        svm.train(training_data, labels)
-        print "Testing:"
-        predictions = svm.test(test_data)
-
-        true_negatives = 0
-        true_positives = 0
-        false_negatives = 0
-        false_positives = 0
-
-        for i, prediction in enumerate(predictions):
-            if prediction[0] < 0 and labels[i][0] < 0:
-                true_negatives += 1
-            if prediction[0] > 0 and labels[i][0] > 0:
-                true_positives += 1
-            if prediction[0] < 0 and labels[i][0] > 0:
-                false_negatives += 1
-            if prediction[0] > 0 and labels[i][0] < 0:
-                false_positives += 1
-        print "True positives: ", true_positives
-        print "True negatives: ", true_negatives
-        print "False positives: ", false_positives
-        print "False negatives: ", false_negatives
-        accuracy = float(true_negatives + true_positives) / (true_negatives + true_positives + false_negatives + false_positives + 1)
-        precision = float(true_positives) / (true_positives + false_positives + 1)
-        recall = float(true_positives) / (true_positives + false_negatives + 1)
-        print "Accuracy: ", accuracy
-        print "Precision: ", precision
-        print "Recall: ", recall
-
-        accuracies.append(accuracy)
-        precisions.append(precision)
-        recalls.append(recall)
-
-    plt.figure()
-    plt.title("Accuracy")
-    plt.plot(range(0, len(accuracies)), accuracies)
-    plt.show()
-    plt.figure()
-    plt.title("Precision")
-    plt.plot(range(0, len(precisions)), precisions)
-    plt.show()
-    plt.figure()
-    plt.title("Recall")
-    plt.plot(range(0, len(recalls)), recalls)
-    plt.show()
+    # for percent in range(1, 10):
+    #     training_data = dataset[0 : len(dataset) * percent / 10]
+    #     test_data = dataset[len(dataset) * percent / 10 : len(dataset)]
+    #
+    #     print "Training with ", len(training_data), " documents"
+    #     print "Testing with ", len(test_data), " documents"
+    #
+    #     # training_labels = labels[0 : len(dataset) * 9 / 10]
+    #     # test_labels = labels[len(dataset) * 9 / 10 : len(dataset)]
+    #
+    #     print "Training:"
+    #     svm = miml_svm.MiMlSVM()
+    #     svm.train(training_data, labels)
+    #     print "Testing:"
+    #     predictions = svm.test(test_data)
+    #
+    #     true_negatives = 0
+    #     true_positives = 0
+    #     false_negatives = 0
+    #     false_positives = 0
+    #
+    #     for i, prediction in enumerate(predictions):
+    #         if prediction[0] < 0 and labels[i][0] < 0:
+    #             true_negatives += 1
+    #         if prediction[0] > 0 and labels[i][0] > 0:
+    #             true_positives += 1
+    #         if prediction[0] < 0 and labels[i][0] > 0:
+    #             false_negatives += 1
+    #         if prediction[0] > 0 and labels[i][0] < 0:
+    #             false_positives += 1
+    #     print "True positives: ", true_positives
+    #     print "True negatives: ", true_negatives
+    #     print "False positives: ", false_positives
+    #     print "False negatives: ", false_negatives
+    #     accuracy = float(true_negatives + true_positives) / (true_negatives + true_positives + false_negatives + false_positives + 1)
+    #     precision = float(true_positives) / (true_positives + false_positives + 1)
+    #     recall = float(true_positives) / (true_positives + false_negatives + 1)
+    #     print "Accuracy: ", accuracy
+    #     print "Precision: ", precision
+    #     print "Recall: ", recall
+    #
+    #     accuracies.append(accuracy)
+    #     precisions.append(precision)
+    #     recalls.append(recall)
+    #
+    # plt.figure()
+    # plt.title("Accuracy")
+    # plt.plot(range(0, len(accuracies)), accuracies)
+    # plt.show()
+    # plt.figure()
+    # plt.title("Precision")
+    # plt.plot(range(0, len(precisions)), precisions)
+    # plt.show()
+    # plt.figure()
+    # plt.title("Recall")
+    # plt.plot(range(0, len(recalls)), recalls)
+    # plt.show()
