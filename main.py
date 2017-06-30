@@ -1,16 +1,12 @@
-import pickle
 import numpy as np
-import scipy.sparse as sp
+import random
 import sys
-from sys import getsizeof
-import time
 
-import matplotlib.pyplot as plt
+import scipy.sparse as sp
+
+import miml_svm
 import parserFile
 import prepareMIML
-import nltk
-import nltk.data
-import miml_svm
 
 
 def save_sparse_csc(filename, array):
@@ -21,73 +17,57 @@ def save_sparse_csc(filename, array):
 def load_sparse_csr(filename):
     loader = np.load(filename)
     return sp.csc_matrix((loader['data'], loader['indices'], loader['indptr']),
-                      shape=loader['shape'])
+                         shape=loader['shape'])
 
+def extract_randomly(data,labels, percent):
+    res_data, res_labels = [], []
+    size = int(len(data) * percent / 100)
+    for index in range(0, size):
+        rand = random.randint(0, len(data) - 1)
+        res_data.append(data.pop(rand))
+        res_labels.append(labels.pop(rand))
+    return res_data, res_labels
+
+def symmetric_difference(a, b):
+    sum = 0
+    for i in range(len(a)):
+        sum += 1 if a[i]*b[i] < 0 else 0
+    return sum
+
+def hamming_loss(prediction, actual):
+    sum = 0
+    for i in range(len(prediction)):
+        sum += 1.0/len(prediction[i])*symmetric_difference(prediction[i], actual[i])
+    return sum / len(prediction)
+
+def one_error(predictions, actual):
+    sum = 0.0
+    for i in range(len(predictions)):
+        best = predictions[i][0]
+        i_best = 0
+        for l in range(len(predictions[i])):
+            if predictions[i][l] > best:
+                best = predictions[i][l]
+                i_best = l
+        if predictions[i][i_best] * actual[i][i_best] < 0:
+            sum += 1
+    return sum / len(predictions)
+
+
+
+def merge_results(values):
+    return np.average(values), np.std(values)
 
 if __name__ == "__main__":
-    # Open the first Reuters data set and create the parser
-    filename = "dataset/reut2-000.sgm"
-    filename2 = "dataset/reut2-001.sgm"
     parser = parserFile.ReutersParser()
 
-    #ORIGINAL
-    # Parse the document and force all generated docs into
-    # a list so that it can be printed out to the console
-    #doc = parser.parse(open(filename, 'rb'))
-    #print list(doc)
-    #pprint.pprint(list(doc))
-
-    if(len(sys.argv) == 2):
+    if (len(sys.argv) == 2):
         config_file = sys.argv[1]
     else:
         config_file = None
-    p = prepareMIML.prepareMIML(config_file)
+    p = prepareMIML.PrepareMIML(config_file)
 
-    #MATRIX
-    #create the matrix instances-dictionary foreach document and foreach file
-        #p.get_full_matrix_instances_dictionary_alternative()
-        #p.get_full_matrix_instances_dictionary()
-
-    #READ FILE
-    #return a matrix where rows are documents (of ONE file) and columns are two: the first with labels and the second with the text
-        #val = p.read_file(filename)
-    #return a matrix as above but from ALL files
-        #val = p.read_all_files()
-
-    #DICTIONARY
-    #return the complete dictionary (all words in ALL files) len: 48377
-        #dictionary = p.create_dictionary()
-    #return all the words from a FILE
-        #words = p.get_words_from_file(filename)
-    #return all the words from a TEXT
-        #words = p.get_words_from_one_document(document)
-
-    #INSTANCES
-    #return all instances from ONE file
-        #instances = p.get_instances_from_file(filename)
-    #return all instances (all sentences from ALL files) len: 123432
-        #instances = p.get_all_instances()
-    #return all instances from a TEXT
-        #instances = p.get_instances_from_text(text)
-
-    #LABELS
-    #return all the labels from ONE file
-        #labels = p.read_all_labels_one_file(filename)
-    #return all the labels from ALL files
-        #all_labels = p.read_all_labels()
-
-
-    # You have to download this data
-    # nltk.download('punkt')
-
-    #PROVA
-    # val = p.read_file(filename)
-    # matrix = p.matrixInstancesDictionaryOneDoc(val[0][1])
-
-    #p.matrixDocLabels() #create the matrix Documents-Labels
-    # p.get_dictionary_2()
-    #sparse_matrix = p.arrayMatrixInstancesDictionaryOneFile(filename)
-    dataset = p.arrayMatrixInstancesDictionaryOneFile(filename)
+    dataset = p.arrayMatrixInstancesDictionary(None)
 
     # print dense_matrix[3] #matrice instanza dizionario del documento 3
     # print dense_matrix[3][2] #dizionario dell'instanza 2 del doc 3
@@ -103,88 +83,89 @@ if __name__ == "__main__":
     # print "Labels first doc"
     # print sum(labels_matrix[0]) #numero di labels del doc 0
 
-    #solo se matrice densa
+    # solo se matrice densa
     # print len(result) #numero di documenti (1000 solo nel primo file)
     # print len(result[0]) #numero di instanze del documento 0 -> 21
     # print len(result[0][0]) #numero di parole del dizionario -> 48377
     # print sum(result[0][0]) #numero di parole nell'instanza 0 -> 38
 
 
-    #save_sparse_csc('array_of_matrix_doc_dictionary_file1',result[0])
-    #matrix = load_sparse_csc('array_of_matrix_doc_dictionary_file1.npz')
-    #matrix.todense()
-
+    # save_sparse_csc('array_of_matrix_doc_dictionary_file1',result[0])
+    # matrix = load_sparse_csc('array_of_matrix_doc_dictionary_file1.npz')
+    # matrix.todense()
 
     # p.create_dictionary()
     # result = p.matrixDocLabels()
 
     # for d, document in enumerate(dense_matrix):
     #     dense_matrix[d] = sp.dok_matrix(document)
-        # for i, instance in enumerate(document):
-        #     document[i] = sp.dok_matrix(instance)
-
+    # for i, instance in enumerate(document):
+    #     document[i] = sp.dok_matrix(instance)
 
     accuracies = []
     precisions = []
     recalls = []
+    hlosses = []
+    oneerrors = []
 
-    training_data = dataset[0: len(dataset) * 6 / 10]
-    test_data = dataset[len(dataset) * 6 / 10: len(dataset)]
+    times = 2
 
-    print "Training:"
-    svm = miml_svm.MiMlSVM()
-    svm.train(training_data, labels)
-    print "Testing:"
-    predictions = svm.test(test_data)
+    for tries in range(times):
+        training_set = list(dataset)
+        training_labels = list(labels)
+        test_set, test_labels = extract_randomly(training_set, training_labels, 25)
 
-    # for percent in range(1, 10):
-    #     training_data = dataset[0 : len(dataset) * percent / 10]
-    #     test_data = dataset[len(dataset) * percent / 10 : len(dataset)]
-    #
-    #     print "Training with ", len(training_data), " documents"
-    #     print "Testing with ", len(test_data), " documents"
-    #
-    #     # training_labels = labels[0 : len(dataset) * 9 / 10]
-    #     # test_labels = labels[len(dataset) * 9 / 10 : len(dataset)]
-    #
-    #     print "Training:"
-    #     svm = miml_svm.MiMlSVM()
-    #     svm.train(training_data, labels)
-    #     print "Testing:"
-    #     predictions = svm.test(test_data)
-    #
-    #     true_negatives = 0
-    #     true_positives = 0
-    #     false_negatives = 0
-    #     false_positives = 0
-    #
-    #     for i, prediction in enumerate(predictions):
-    #         if prediction[0] < 0 and labels[i][0] < 0:
-    #             true_negatives += 1
-    #         if prediction[0] > 0 and labels[i][0] > 0:
-    #             true_positives += 1
-    #         if prediction[0] < 0 and labels[i][0] > 0:
-    #             false_negatives += 1
-    #         if prediction[0] > 0 and labels[i][0] < 0:
-    #             false_positives += 1
-    #     print "True positives: ", true_positives
-    #     print "True negatives: ", true_negatives
-    #     print "False positives: ", false_positives
-    #     print "False negatives: ", false_negatives
-    #     accuracy = float(true_negatives + true_positives) / (true_negatives + true_positives + false_negatives + false_positives + 1)
-    #     precision = float(true_positives) / (true_positives + false_positives + 1)
-    #     recall = float(true_positives) / (true_positives + false_negatives + 1)
-    #     print "Accuracy: ", accuracy
-    #     print "Precision: ", precision
-    #     print "Recall: ", recall
-    #
-    #     accuracies.append(accuracy)
-    #     precisions.append(precision)
-    #     recalls.append(recall)
-    #
+        svm = miml_svm.MiMlSVM()
+        svm.train(training_set, training_labels)
+        predictions = svm.test(test_set)
+
+        hloss = hamming_loss(np.sign(predictions), test_labels)
+        oneerror = one_error(predictions, test_labels)
+        print "Hloss... ", hloss
+        print "Oneerror... ", oneerror
+        hlosses.append(hloss)
+        oneerrors.append(oneerror)
+
+        # true_negatives = 0
+        # true_positives = 0
+        # false_negatives = 0
+        # false_positives = 0
+        # for i, prediction in enumerate(predictions):
+        #     for j, predicted_label in enumerate(prediction):
+        #
+        #         if predicted_label < 0 and labels[i][j] < 0:
+        #             true_negatives += 1
+        #         if predicted_label > 0 and labels[i][j] > 0:
+        #             true_positives += 1
+        #         if predicted_label < 0 < labels[i][j]:
+        #             false_negatives += 1
+        #         if labels[i][j] < 0 < predicted_label:
+        #             false_positives += 1
+        # print "True positives: ", true_positives
+        # print "True negatives: ", true_negatives
+        # print "False positives: ", false_positives
+        # print "False negatives: ", false_negatives
+        # accuracy = float(true_negatives + true_positives) \
+        #            / (true_negatives + true_positives + false_negatives + false_positives + 1)
+        # precision = float(true_positives) / (true_positives + false_positives + 1)
+        # recall = float(true_positives) / (true_positives + false_negatives + 1)
+        # print "Accuracy: ", accuracy
+        # print "Precision: ", precision
+        # print "Recall: ", recall
+
+        # accuracies.append(accuracy)
+        # precisions.append(precision)
+        # recalls.append(recall)
+
+    hloss_mean, hloss_sd = merge_results(hlosses)
+    oneerror_mean, oneerror_sd = merge_results(oneerrors)
+
+    print "Hloss : ", hloss_mean, " +/- " , hloss_sd
+    print "Oneerror : ", oneerror_mean, " +/- " , oneerror_sd
+
     # plt.figure()
-    # plt.title("Accuracy")
-    # plt.plot(range(0, len(accuracies)), accuracies)
+    # plt.title("H-loss")
+    # plt.plot(range(0, len(hlosses)), hlosses)
     # plt.show()
     # plt.figure()
     # plt.title("Precision")

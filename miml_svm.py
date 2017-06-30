@@ -28,4 +28,4 @@ class MiMlSVM:
             all_labels.append(SVM.predict(test_set))
             index += 1
             print "Tested " + str(index) + " labels of " + str(len(self.SVMs))
-        return np.sign(np.transpose(all_labels))
+        return np.transpose(all_labels)
