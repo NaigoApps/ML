@@ -41,11 +41,17 @@ class PrepareMIML:
         self.init_dictionary()
         array_docs = []
         self.log("Found " + str(len(self.documents)) + " documents")
+        excluded = 0
         for i, doc in enumerate(self.documents):
             self.progress("Doc " + str(i + 1) + " of " + str(len(self.documents)))
             instances = self.sparseMatrixInstancesDictionaryOneDoc(doc['instances'])
-            array_docs.append(instances)
-        self.log("")
+            if instances is not None:
+                array_docs.append(instances)
+            else:
+                doc['excluded'] = True
+                excluded += 1
+        self.documents = [doc for doc in self.documents if not doc['excluded']]
+        self.log("Excluded " + str(excluded) + " documents, now they are " + str(len(self.documents)))
         return array_docs
 
     def init_documents(self, filename):
@@ -106,6 +112,7 @@ class PrepareMIML:
     def create_dictionary(self):
         # scan all document from dataset and create the dictionary with all words
         all_words = {}
+        words_index = []
 
         print "Creating dictionary..."
         counter = 0
@@ -117,7 +124,6 @@ class PrepareMIML:
         for d, doc in enumerate(self.documents):
             doc_words = doc['words']
             dictionary_growth.append(0)
-            words_index = []
             for word in doc_words:
                 counter += 1
                 if counter % 1000 == 0:
@@ -169,6 +175,7 @@ class PrepareMIML:
         M = len(self.dictionary)
         m = []
         # m *= -1
+        excluded = 0;
         for i, instance in enumerate(instances):
             words = self.get_words_from_one_document(instance)
             if len(words) > 0:
@@ -186,9 +193,16 @@ class PrepareMIML:
                         # for j, word_in_dictionary in enumerate(self.dictionary):
                         #     if word == word_in_dictionary:
                         #         m[i][j] += 1
-                m.append(instance)
-        return sp.csr_matrix(np.asmatrix(m))
-
+                if instance.sum() > 0:
+                    m.append(instance)
+                else:
+                    excluded += 1
+        if excluded > 0:
+            print "Excluded " + str(excluded) + " instances"
+        if np.asmatrix(m).sum() > 0:
+            return sp.csr_matrix(np.asmatrix(m))
+        else:
+            return None
 
 
 
@@ -362,19 +376,31 @@ class PrepareMIML:
     def remove_rare_words(self):
         # self.dictionary[word][0] -> index
         # self.dictionary[word][1] -> count
-        word_occurrences = [data[1] for word, data in self.dictionary.iteritems()]
-        pyplot.hist(word_occurrences, bins=range(1, np.max(word_occurrences)))
-        pyplot.show()
+        # PLOT DICTIONARY
+        # word_occurrences = [data[1] for word, data in self.dictionary.iteritems()]
+        # pyplot.hist(word_occurrences, bins=range(1, np.max(word_occurrences)))
+        # pyplot.show()
 
-        min_occurrences = 0
+        percent = 0
         if self.use_conf:
-            min_occurrences = conf.min_word_occurrences
+            percent = conf.keep_word_percent
         else:
-            min_occurrences = int(raw_input("Enter minimum number of occurrences - "))
+            percent = int(raw_input("Enter percent of words - "))
 
-        self.log("Deleting words with less than " + str(min_occurrences) + " occurrences")
+        self.log("Deleting words...")
         old_length = len(self.dictionary)
-        self.dictionary = {word: data for word, data in self.dictionary.iteritems() if data[1] >= min_occurrences}
+        n_words = percent * len(self.dictionary) / 100
+        kept_words = {}
+
+        for i in range(n_words):
+            best_word = None
+            for word, data in self.dictionary.iteritems():
+                if best_word is None or data[1] > self.dictionary[best_word][1]:
+                    best_word = word
+            kept_words[best_word] = self.dictionary[best_word]
+            del self.dictionary[best_word]
+
+        self.dictionary = kept_words
         self.log("Removed " + str(old_length - len(self.dictionary)) + " rare words, now they are " + str(len(self.dictionary)))
 
     def create_dict_2(self):
@@ -507,10 +533,11 @@ class PrepareMIML:
         docs = parser.parse(open(filename, 'rb'))
         return [
             {
-                'text': doc[1],
-                'words': re.compile('\w+').findall(doc[1]),
-                'instances': self.get_instances_from_text(doc[1]),
-                'labels': doc[0]
+                'text': doc[1].lower(),
+                'words': re.compile('\w+').findall(doc[1].lower()),
+                'instances': self.get_instances_from_text(doc[1].lower()),
+                'labels': doc[0],
+                'excluded' : False
             }
             for doc in list(docs)
             ]
