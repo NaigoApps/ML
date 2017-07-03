@@ -133,18 +133,12 @@ class PrepareMIML:
         self.dictionary = all_words
 
         # Remove stopwords
-        if not self.use_conf:
-            choice = raw_input("Want to remove stopwords? (y/n) - ")
-        else:
-            choice = conf.remove_stopwords
+        choice = conf.remove_stopwords if self.use_conf else raw_input("Want to remove stopwords? (y/n) - ")
         if choice == "y":
             self.remove_stopwords()
 
         # Remove rare words
-        if not self.use_conf:
-            choice = raw_input("Want to remove rare words? (y/n) - ")
-        else:
-            choice = conf.remove_rare_words
+        choice = conf.remove_rare_words if self.use_conf else raw_input("Want to remove rare words? (y/n) - ")
         if choice == "y":
             self.remove_rare_words()
 

@@ -12,6 +12,7 @@ import random
 import sys
 
 import scipy.sparse as sp
+import scipy.io as sio
 
 import miml_svm
 import parserFile
@@ -68,7 +69,6 @@ def merge_results(values):
     return np.average(values), np.std(values)
 
 if __name__ == "__main__":
-    parser = parserFile.ReutersParser()
 
     if (len(sys.argv) == 2):
         config_file = sys.argv[1]

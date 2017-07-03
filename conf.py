@@ -6,4 +6,4 @@ min_words = 10
 min_instances = 2
 remove_docs_0_label = "y"
 remove_docs_1_label = "y"
-keep_word_percent = 1
+keep_word_percent = 2
