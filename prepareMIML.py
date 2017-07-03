@@ -244,6 +244,7 @@ class PrepareMIML:
         all_words = re.compile('\w+').findall(text)
         sentences = []
         for i in range(0,len(all_words),25):
+
             sentences += all_words[i:i+50]
 
         return sentences
@@ -576,10 +577,13 @@ class PrepareMIML:
                 else:
                     all_labels[label][1] += 1
 
-        #we use only the 20% most frequent labels
+        #we use only the 20% most frequent labels or limited
         top_labels = {}
         counter = 0
-        for percent in range(0, int(len(self.labels)/50)):
+        #limit = int(len(self.labels)/50)
+        limit = 7
+
+        for percent in range(0, limit):
             best = 0
             best_label = ""
             for label in self.labels:
