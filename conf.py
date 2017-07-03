@@ -1,10 +1,9 @@
 remove_stopwords = "y"
 remove_rare_words = "y"
-min_occurrences = 10
-keep_dictionary = "n"
+keep_dictionary = "y"
 remove_short_docs = "y"
+min_words = 10
+min_instances = 2
 remove_docs_0_label = "y"
 remove_docs_1_label = "y"
-show_documents_hist = "n"
-min_instances = 5
 keep_word_percent = 1

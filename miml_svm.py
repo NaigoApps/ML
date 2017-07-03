@@ -12,9 +12,9 @@ class MiMlSVM:
         index = 0
         glob_start = time.time()
         for label in np.transpose(labels):
-            # classifier = misvm.MISVM(kernel='linear', C=1.0, max_iters=50)
             start = time.time()
             classifier = misvm.SIL(kernel='linear', C=1.0)
+            # classifier = misvm.MISVM(kernel='linear', C=1.0, max_iters=50)
             classifier.fit(dataset, np.array(label))
             self.SVMs.append(classifier)
             index += 1

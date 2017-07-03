@@ -42,56 +42,51 @@ class PrepareMIML:
         array_docs = []
         self.log("Found " + str(len(self.documents)) + " documents")
         excluded = 0
+        n_instances = 0
         for i, doc in enumerate(self.documents):
             self.progress("Doc " + str(i + 1) + " of " + str(len(self.documents)))
             instances = self.sparseMatrixInstancesDictionaryOneDoc(doc['instances'])
             if instances is not None:
                 array_docs.append(instances)
+                n_instances += instances.shape[0]
             else:
                 doc['excluded'] = True
                 excluded += 1
         self.documents = [doc for doc in self.documents if not doc['excluded']]
         self.log("Excluded " + str(excluded) + " documents, now they are " + str(len(self.documents)))
+        self.log("Got " + str(n_instances) + " instances")
         return array_docs
 
     def init_documents(self, filename):
         print "Loading documents..."
-        if filename is None:
-            self.documents = self.read_all_files()
-        else:
-            self.documents = self.read_file(filename)
-
-        choice = conf.remove_short_docs if self.use_conf else raw_input("Want to remove short documents? (y/n) - ")
-        if choice == "y":
-            self.remove_short_documents()
+        self.documents = self.read_all_files() if filename is None else self.read_file(filename)
 
         choice = conf.remove_docs_0_label if self.use_conf else raw_input("Want to remove documents with 0 labels? (y/n) - ")
         if choice == "y":
             self.remove_docs_0_label()
+
+        choice = conf.remove_short_docs if self.use_conf else raw_input("Want to remove short documents? (y/n) - ")
+        if choice == "y":
+            self.remove_short_documents()
 
         choice = conf.remove_docs_1_label if self.use_conf else raw_input("Want to remove documents with only 1 label? (y/n) - ")
         if choice == "y":
             self.remove_docs_1_label()
 
     def remove_short_documents(self):
-        lengths = [len(doc['instances']) for doc in self.documents]
-        if not self.use_conf or conf.show_documents_hist == "y":
-            pyplot.hist(lengths, bins=range(0, np.max(lengths) + 1))
-            pyplot.xlabel("Number of phrases")
-            pyplot.ylabel("Number of documents")
-            pyplot.show()
+        min_words = conf.min_words if self.use_conf else int(raw_input("Enter minimum number of words - "))
 
-            min_instances = 0
-        if self.use_conf:
-            min_instances = conf.min_instances
-        else:
-            min_instances = int(raw_input("Enter minimum number of phrases - "))
+        self.log("Deleting documents with less than " + str(min_words) + " words")
+        old_length = len(self.documents)
+        self.documents = [doc for doc in self.documents if len(doc['words']) >= min_words]
+        self.log("Removed " + str(old_length - len(self.documents)) + " short documents of " + str(old_length) + " now they are " + str(len(self.documents)))
+
+        min_instances = conf.min_instances if self.use_conf else int(raw_input("Enter minimum number of phrases - "))
 
         self.log("Deleting documents with less than " + str(min_instances) + " phrases")
         old_length = len(self.documents)
         self.documents = [doc for doc in self.documents if len(doc['instances']) >= min_instances]
         self.log("Removed " + str(old_length - len(self.documents)) + " short documents of " + str(old_length) + " now they are " + str(len(self.documents)))
-
 
     def remove_docs_0_label(self):
         lengths = [len(doc['labels']) for doc in self.documents]
@@ -183,16 +178,6 @@ class PrepareMIML:
                 for word in words:
                     if self.dictionary.has_key(word):
                         instance[self.dictionary[word][0]] += 1
-                        # SPARSE DICTIONARY WAY
-                        # if self.dictionary.has_key(word):
-                        #     if(m[i].has_key(self.dictionary[word])):
-                        #         m[i][self.dictionary[word]] = m[i][self.dictionary[word]] + 1
-                        #     else:
-                        #         m[i][self.dictionary[word]] = 1
-
-                        # for j, word_in_dictionary in enumerate(self.dictionary):
-                        #     if word == word_in_dictionary:
-                        #         m[i][j] += 1
                 if instance.sum() > 0:
                     m.append(instance)
                 else:
@@ -203,7 +188,32 @@ class PrepareMIML:
             return sp.csr_matrix(np.asmatrix(m))
         else:
             return None
+            # used
 
+    def read_all_files(self):
+        all_docs = []
+        files = glob.glob('dataset/*.sgm')
+        for f, filename in enumerate(files):
+            self.progress('%.2f' % (float(100 * f) / len(files)) + '%')
+            documents = self.read_file(filename)
+            all_docs += documents
+        self.progress('100.00%\n')
+        return all_docs
+
+    # used
+    def read_file(self, filename):
+        parser = parserFile.ReutersParser()
+        docs = parser.parse(open(filename, 'rb'))
+        return [
+            {
+                'text': doc[1].lower(),
+                'words': re.compile('\w+').findall(doc[1].lower()),
+                'instances': self.get_instances_from_text(doc[1].lower()),
+                'labels': doc[0],
+                'excluded': False
+            }
+            for doc in list(docs)
+            ]
 
 
 
@@ -515,35 +525,6 @@ class PrepareMIML:
     def progress(self, str):
         print '\r' + str,
         sys.stdout.flush()
-
-    # used
-    def read_all_files(self):
-        all_docs = []
-        files = glob.glob('dataset/*.sgm')
-        for f, filename in enumerate(files):
-            self.progress('%.2f' % (float(100 * f) / len(files)) + '%')
-            documents = self.read_file(filename)
-            all_docs += documents
-        self.progress('100.00%\n')
-        return all_docs
-
-    # used
-    def read_file(self, filename):
-        parser = parserFile.ReutersParser()
-        docs = parser.parse(open(filename, 'rb'))
-        return [
-            {
-                'text': doc[1].lower(),
-                'words': re.compile('\w+').findall(doc[1].lower()),
-                'instances': self.get_instances_from_text(doc[1].lower()),
-                'labels': doc[0],
-                'excluded' : False
-            }
-            for doc in list(docs)
-            ]
-
-
-        # return m
 
     def denseMatrixInstancesDictionaryOneDoc(self, document):
         if not self.dictionary:

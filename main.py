@@ -1,3 +1,12 @@
+# def transform(mx):
+#     """
+#     Transform into np.matrix if array/list
+#     ignore scipy.sparse matrix
+#     """
+#     if issparse(mx):
+#         return mx.todense()
+#     return np.asmatrix(mx)
+
 import numpy as np
 import random
 import sys
@@ -67,6 +76,7 @@ if __name__ == "__main__":
         config_file = None
     p = prepareMIML.PrepareMIML(config_file)
 
+    # dataset = p.arrayMatrixInstancesDictionary('./dataset/reut2-000.sgm')
     dataset = p.arrayMatrixInstancesDictionary(None)
 
     # print dense_matrix[3] #matrice instanza dizionario del documento 3
