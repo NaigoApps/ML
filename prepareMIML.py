@@ -41,20 +41,16 @@ class PrepareMIML:
         self.init_dictionary()
         array_docs = []
         self.log("Found " + str(len(self.documents)) + " documents")
-        excluded = 0
-        n_instances = 0
+        doc_excluded = []
         for i, doc in enumerate(self.documents):
             self.progress("Doc " + str(i + 1) + " of " + str(len(self.documents)))
             instances = self.sparseMatrixInstancesDictionaryOneDoc(doc['instances'])
             if instances is not None:
                 array_docs.append(instances)
-                n_instances += instances.shape[0]
             else:
-                doc['excluded'] = True
-                excluded += 1
-        self.documents = [doc for doc in self.documents if not doc['excluded']]
-        self.log("Excluded " + str(excluded) + " documents, now they are " + str(len(self.documents)))
-        self.log("Got " + str(n_instances) + " instances")
+                doc_excluded += doc
+        self.documents = [doc for doc in self.documents if doc not in doc_excluded]
+        self.log("Excluded " + str(len(doc_excluded)) + " documents, now they are " + str(len(self.documents)))
         return array_docs
 
     def init_documents(self, filename):
@@ -188,7 +184,6 @@ class PrepareMIML:
             return sp.csr_matrix(np.asmatrix(m))
         else:
             return None
-            # used
 
     def read_all_files(self):
         all_docs = []
@@ -214,8 +209,6 @@ class PrepareMIML:
             }
             for doc in list(docs)
             ]
-
-
 
 
 
