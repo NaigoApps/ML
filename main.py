@@ -77,7 +77,7 @@ if __name__ == "__main__":
     p = prepareMIML.PrepareMIML(config_file)
 
     # dataset = p.arrayMatrixInstancesDictionary('./dataset/reut2-000.sgm')
-    dataset = p.arrayMatrixInstancesDictionary(None)
+    dataset = p.arrayMatrixInstancesDictionary('./dataset/reut2-000.sgm')
 
     # print dense_matrix[3] #matrice instanza dizionario del documento 3
     # print dense_matrix[3][2] #dizionario dell'instanza 2 del doc 3
@@ -111,6 +111,7 @@ if __name__ == "__main__":
     #     dense_matrix[d] = sp.dok_matrix(document)
     # for i, instance in enumerate(document):
     #     document[i] = sp.dok_matrix(instance)
+
 
     accuracies = []
     precisions = []

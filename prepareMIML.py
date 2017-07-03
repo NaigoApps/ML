@@ -239,6 +239,15 @@ class PrepareMIML:
         result = list(sentences)
         return result[0:len(result) - 1]
 
+    #different way overlapping windows of 50 words
+    def get_instances_from_text_new_version(self, text):
+        all_words = re.compile('\w+').findall(text)
+        sentences = []
+        for i in range(0,len(all_words),25):
+            sentences += all_words[i:i+50]
+
+        return sentences
+
     def get_matrix_instances_labels(self):
         # returns the matrix where in the row there are all the instances (sentences) of a document
         # and the columns are all the labels. In a cell [instance][label] there is 1 if exists a document with the sentence "instance" and labeled with "label"
