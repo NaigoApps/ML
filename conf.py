@@ -1,6 +1,6 @@
 remove_stopwords = "y"
 remove_rare_words = "y"
-keep_dictionary = "y"
+keep_dictionary = "n"
 remove_short_docs = "y"
 min_words = 10
 min_instances = 2
