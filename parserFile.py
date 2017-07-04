@@ -63,7 +63,7 @@ class ReutersParser(HTMLParser):
             self.in_body = True
         elif tag == "topics":
             self.in_topics = True
-        elif tag == "d":
+        elif tag == "d" and self.in_topics:
             self.in_topic_d = True
 
     def handle_endtag(self, tag):
@@ -92,7 +92,8 @@ class ReutersParser(HTMLParser):
             self.in_topics = False
         elif tag == "d":
             self.in_topic_d = False
-            self.topics.append(self.topic_d)
+            if self.topic_d:
+                self.topics.append(self.topic_d)
             self.topic_d = ""
 
     def handle_data(self, data):

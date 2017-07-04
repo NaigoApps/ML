@@ -3,13 +3,15 @@ import logging
 import numpy as np
 import os
 import pickle
+from stemming.porter2 import stem
 import re
+import string
 import sys
+import uuid
 
 import nltk
 import scipy
 import scipy.sparse as sp
-from matplotlib import pyplot
 
 import conf
 import parserFile
@@ -51,6 +53,12 @@ class PrepareMIML:
                 doc_excluded += doc
         self.documents = [doc for doc in self.documents if doc not in doc_excluded]
         self.log("Excluded " + str(len(doc_excluded)) + " documents, now they are " + str(len(self.documents)))
+
+        n_instances = []
+        for doc in self.documents:
+            n_instances.append(len(doc['instances']))
+        print "Found " + str(np.sum(np.array(n_instances))) + " instances, mean is " + str(np.mean(np.array(n_instances)))
+
         return array_docs
 
     def init_documents(self, filename):
@@ -69,19 +77,16 @@ class PrepareMIML:
         if choice == "y":
             self.remove_docs_1_label()
 
+        print "Stemming words..."
+        for doc in self.documents:
+            doc["words"] = [stem(word) for word in doc["words"]]
+
     def remove_short_documents(self):
         min_words = conf.min_words if self.use_conf else int(raw_input("Enter minimum number of words - "))
 
         self.log("Deleting documents with less than " + str(min_words) + " words")
         old_length = len(self.documents)
         self.documents = [doc for doc in self.documents if len(doc['words']) >= min_words]
-        self.log("Removed " + str(old_length - len(self.documents)) + " short documents of " + str(old_length) + " now they are " + str(len(self.documents)))
-
-        min_instances = conf.min_instances if self.use_conf else int(raw_input("Enter minimum number of phrases - "))
-
-        self.log("Deleting documents with less than " + str(min_instances) + " phrases")
-        old_length = len(self.documents)
-        self.documents = [doc for doc in self.documents if len(doc['instances']) >= min_instances]
         self.log("Removed " + str(old_length - len(self.documents)) + " short documents of " + str(old_length) + " now they are " + str(len(self.documents)))
 
     def remove_docs_0_label(self):
@@ -93,17 +98,22 @@ class PrepareMIML:
             old_length) + " now they are " + str(len(self.documents)))
 
     def remove_docs_1_label(self):
-        lengths = [len(doc['labels']) for doc in self.documents]
+        min_docs = conf.min_docs_number if self.use_conf else int(raw_input("Enter minimum number of documents - "))
+
         self.log("Deleting documents with 1 label")
         old_length = len(self.documents)
-        self.documents = [doc for doc in self.documents if len(doc['labels']) > 1]
+        bad_documents = set([doc['id'] for doc in self.documents if len(doc['labels']) == 1])
+        while len(self.documents) - len(bad_documents) < min_docs and len(bad_documents) > 0:
+            bad_documents.pop()
+
+        self.documents = [doc for doc in self.documents if doc['id'] not in bad_documents]
         self.log("Removed " + str(old_length - len(self.documents)) + " documents with 1 label of " + str(
             old_length) + " now they are " + str(len(self.documents)))
 
     def create_dictionary(self):
         # scan all document from dataset and create the dictionary with all words
         all_words = {}
-        words_index = []
+        words_index = set()
 
         print "Creating dictionary..."
         counter = 0
@@ -121,7 +131,7 @@ class PrepareMIML:
                     self.progress("%.2f" % (float(100 * counter) / total_words) + "%")
                 if word not in words_index:
                     dictionary_growth[d] += 1
-                    words_index.append(word)
+                    words_index.add(word)
                     all_words[word] = [-1, 1]
                 else:
                     all_words[word][1] += 1
@@ -166,6 +176,7 @@ class PrepareMIML:
             if len(words) > 0:
                 instance = np.zeros((M))
                 for word in words:
+                    word = stem(word)
                     if self.dictionary.has_key(word):
                         instance[self.dictionary[word][0]] += 1
                 if instance.sum() > 0:
@@ -173,9 +184,9 @@ class PrepareMIML:
                 else:
                     excluded += 1
         if excluded > 0:
-            print "Excluded " + str(excluded) + " instances"
+            print "Excluded " + str(excluded) + " instances of " + str(len(instances))
         if np.asmatrix(m).sum() > 0:
-            return sp.csr_matrix(np.asmatrix(m))
+            return sp.csr_matrix(np.asmatrix(m).astype(np.float32))
         else:
             return None
 
@@ -195,11 +206,11 @@ class PrepareMIML:
         docs = parser.parse(open(filename, 'rb'))
         return [
             {
+                'id': uuid.uuid4().int,
                 'text': doc[1].lower(),
                 'words': re.compile('\w+').findall(doc[1].lower()),
-                'instances': self.get_instances_from_text(doc[1].lower()),
+                'instances': self.get_instances_from_text_new_version(doc[1].lower()),
                 'labels': doc[0],
-                'excluded': False
             }
             for doc in list(docs)
             ]
@@ -237,8 +248,8 @@ class PrepareMIML:
     def get_instances_from_text_new_version(self, text):
         all_words = re.compile('\w+').findall(text)
         sentences = []
-        for i in range(0,len(all_words),25):
-            sentences += all_words[i:i+50]
+        for i in range(0,len(all_words),50):
+            sentences.append(string.join(all_words[i:i+50], " "))
 
         return sentences
 
@@ -409,26 +420,6 @@ class PrepareMIML:
         self.dictionary = kept_words
         self.log("Removed " + str(old_length - len(self.dictionary)) + " rare words, now they are " + str(len(self.dictionary)))
 
-    def create_dict_2(self):
-        print "Creating dictionary..."
-        all_words = set()
-        docs = self.read_all_files()
-        i = 0
-        for doc in docs:
-            for word in self.get_words_from_one_document(doc[1]):
-                all_words.add(word)
-        dictionary = dict(zip(all_words, list(xrange(len(all_words)))))
-        self.dictionary = dictionary
-        with open('dictionary_2.txt', 'w') as fp:
-            pickle.dump(dictionary, fp)
-        return dictionary
-
-    def get_dictionary_2(self):
-        with open('dictionary_2.txt', 'r') as fp:
-            itemlist = pickle.load(fp)
-        self.dictionary = itemlist
-        return itemlist
-
 
     # used
     def init_dictionary(self):
@@ -573,7 +564,7 @@ class PrepareMIML:
         #we use only the 20% most frequent labels
         top_labels = {}
         counter = 0
-        for percent in range(0, int(len(self.labels)/50)):
+        while len(top_labels) < 7 and len(top_labels) != len(all_labels):
             best = 0
             best_label = ""
             for label in self.labels:
