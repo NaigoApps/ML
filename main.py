@@ -36,95 +36,6 @@ def extract_randomly(data,labels, percent):
         res_labels.append(labels.pop(rand))
     return res_data, res_labels
 
-def symmetric_difference(a, b):
-    sum = 0
-    for i in range(len(a)):
-        sum += 1 if a[i]*b[i] < 0 else 0
-    return sum
-
-def hamming_loss(prediction, actual):
-    sum = 0
-    for i in range(len(prediction)):
-        sum += 1.0/len(prediction[i])*symmetric_difference(prediction[i], actual[i])
-    return sum / len(prediction)
-
-def one_error(predictions, actual):
-    sum = 0.0
-    for i in range(len(predictions)):
-        best = predictions[i][0]
-        i_best = 0
-        for l in range(len(predictions[i])):
-            if predictions[i][l] > best:
-                best = predictions[i][l]
-                i_best = l
-        if predictions[i][i_best] * actual[i][i_best] < 0:
-            sum += 1
-    return sum / len(predictions)
-
-def make_ranks(v):
-    v = np.array(v)
-    ranks = np.zeros(len(v))
-    cur_rank = 1
-    for i in range(len(v)):
-        ranks[np.argmax(v)] = cur_rank
-        cur_rank += 1
-        v[np.argmax(v)] = v[np.argmin(v)] - 1
-    return ranks
-
-
-def coverage(predictions, actuals):
-    sum = 0.0
-    for i in range(len(predictions)):
-        ranks = make_ranks(predictions[i])
-        pos_indexes = []
-        for j in range(len(actuals[i])):
-            if actuals[i][j] > 0:
-                pos_indexes.append(j)
-        if len(pos_indexes) > 0:
-            best_ranked_index = pos_indexes[0]
-            for j in pos_indexes:
-                if ranks[j] > ranks[best_ranked_index]:
-                    best_ranked_index = j
-            sum += ranks[best_ranked_index] - 1
-
-    return sum / len(predictions)
-
-def rank_loss(predictions, actuals):
-    sum = 0.0
-    for p in range(len(predictions)):
-        cur_sum = 0.0
-        positives = 0
-        for i in range(len(actuals[p])):
-            if actuals[p][i] > 0:
-                positives += 1
-            for j in range(len(actuals[p])):
-                #foreach (i,j) where i is a real label and j is not
-                if actuals[p][j] < 0 < actuals[p][i]:
-                    if predictions[p][i] < predictions[p][j]:
-                        cur_sum += 1
-        if positives * (len(actuals[p]) - positives) > 0:
-            cur_sum /= positives * (len(actuals[p]) - positives)
-            sum += cur_sum
-    return sum / len(predictions)
-
-def avg_precision(predictions, actuals):
-    sum = 0.0
-    for i in range(len(predictions)):
-        ranks = make_ranks(predictions[i])
-        pos_indexes = []
-        for y in range(len(actuals[i])):
-            if actuals[i][y] > 0:
-                pos_indexes.append(y)
-        for y in pos_indexes:
-            cur_sum = 0.0
-            for y1 in pos_indexes:
-                if ranks[y1] <= ranks[y]:
-                    cur_sum += 1
-            cur_sum /= ranks[y]
-        if len(pos_indexes) > 0:
-            sum += cur_sum / len(pos_indexes)
-    return sum / len(predictions)
-
 def merge_results(values):
     return np.average(values), np.std(values)
 
@@ -136,8 +47,8 @@ if __name__ == "__main__":
         config_file = None
     p = prepareMIML.PrepareMIML(config_file)
 
-    dataset = p.arrayMatrixInstancesDictionary('./dataset/reut2-000.sgm')
-    # dataset = p.arrayMatrixInstancesDictionary(None)
+    # dataset = p.arrayMatrixInstancesDictionary('./dataset/reut2-000.sgm')
+    dataset = p.arrayMatrixInstancesDictionary(None)
 
     # print dense_matrix[3] #matrice instanza dizionario del documento 3
     # print dense_matrix[3][2] #dizionario dell'instanza 2 del doc 3
