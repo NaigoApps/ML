@@ -564,7 +564,7 @@ class PrepareMIML:
         #we use only the 20% most frequent labels
         top_labels = {}
         counter = 0
-        while len(top_labels) < 7 and len(top_labels) != len(all_labels):
+        while len(top_labels) < conf.max_labels and len(top_labels) != len(all_labels):
             best = 0
             best_label = ""
             for label in self.labels:

@@ -7,3 +7,4 @@ remove_docs_0_label = "y"
 remove_docs_1_label = "y"
 min_docs_number = 2000
 keep_word_percent = 2
+max_labels = 5

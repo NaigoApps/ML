@@ -15,7 +15,7 @@ import scipy.sparse as sp
 
 import miml_svm
 import prepareMIML
-
+from LearningResult import LearningResult
 
 def save_sparse_csc(filename, array):
     np.savez(filename, data=array.data, indices=array.indices,
@@ -61,7 +61,69 @@ def one_error(predictions, actual):
             sum += 1
     return sum / len(predictions)
 
+def make_ranks(v):
+    v = np.array(v)
+    ranks = np.zeros(len(v))
+    cur_rank = 1
+    for i in range(len(v)):
+        ranks[np.argmax(v)] = cur_rank
+        cur_rank += 1
+        v[np.argmax(v)] = v[np.argmin(v)] - 1
+    return ranks
 
+
+def coverage(predictions, actuals):
+    sum = 0.0
+    for i in range(len(predictions)):
+        ranks = make_ranks(predictions[i])
+        pos_indexes = []
+        for j in range(len(actuals[i])):
+            if actuals[i][j] > 0:
+                pos_indexes.append(j)
+        if len(pos_indexes) > 0:
+            best_ranked_index = pos_indexes[0]
+            for j in pos_indexes:
+                if ranks[j] > ranks[best_ranked_index]:
+                    best_ranked_index = j
+            sum += ranks[best_ranked_index] - 1
+
+    return sum / len(predictions)
+
+def rank_loss(predictions, actuals):
+    sum = 0.0
+    for p in range(len(predictions)):
+        cur_sum = 0.0
+        positives = 0
+        for i in range(len(actuals[p])):
+            if actuals[p][i] > 0:
+                positives += 1
+            for j in range(len(actuals[p])):
+                #foreach (i,j) where i is a real label and j is not
+                if actuals[p][j] < 0 < actuals[p][i]:
+                    if predictions[p][i] < predictions[p][j]:
+                        cur_sum += 1
+        if positives * (len(actuals[p]) - positives) > 0:
+            cur_sum /= positives * (len(actuals[p]) - positives)
+            sum += cur_sum
+    return sum / len(predictions)
+
+def avg_precision(predictions, actuals):
+    sum = 0.0
+    for i in range(len(predictions)):
+        ranks = make_ranks(predictions[i])
+        pos_indexes = []
+        for y in range(len(actuals[i])):
+            if actuals[i][y] > 0:
+                pos_indexes.append(y)
+        for y in pos_indexes:
+            cur_sum = 0.0
+            for y1 in pos_indexes:
+                if ranks[y1] <= ranks[y]:
+                    cur_sum += 1
+            cur_sum /= ranks[y]
+        if len(pos_indexes) > 0:
+            sum += cur_sum / len(pos_indexes)
+    return sum / len(predictions)
 
 def merge_results(values):
     return np.average(values), np.std(values)
@@ -85,6 +147,13 @@ if __name__ == "__main__":
     # print ""
 
     labels = p.matrixDocLabelsOneFile()
+
+    for label in np.array(labels).transpose():
+        sum = 0.0
+        for doc in label:
+            if doc > 0:
+                sum += 1
+        print sum
     # print labels_matrix #matrice documento label
     # print labels_matrix[0] #tutte le label del doc 1
     # print labels_matrix[0][1] #label 1 del documento 0
@@ -111,11 +180,13 @@ if __name__ == "__main__":
     #     document[i] = sp.dok_matrix(instance)
 
 
-    accuracies = []
-    precisions = []
-    recalls = []
     hlosses = []
+    coverages = []
     oneerrors = []
+    rlosses = []
+    avg_precs = []
+    avg_recs = []
+    avg_F1s = []
 
     times = 2
 
@@ -128,12 +199,22 @@ if __name__ == "__main__":
         svm.train(training_set, training_labels)
         predictions = svm.test(test_set)
 
-        hloss = hamming_loss(np.sign(predictions), test_labels)
-        oneerror = one_error(predictions, test_labels)
-        print "Hloss... ", hloss
-        print "Oneerror... ", oneerror
-        hlosses.append(hloss)
-        oneerrors.append(oneerror)
+        result = LearningResult(predictions, test_labels)
+
+        print "Hloss... ", result.hamming_loss()
+        print "Oneerror... ", result.one_error()
+        print "Coverage... ", result.coverage()
+        print "Rank loss... ", result.ranking_loss()
+        print "Avg precision... ", result.average_precision()
+        print "Avg recall... ", result.average_recall()
+        print "Avg F1... ", result.average_F1()
+        hlosses.append(result.hamming_loss())
+        oneerrors.append(result.one_error())
+        coverages.append(result.coverage())
+        rlosses.append(result.ranking_loss())
+        avg_precs.append(result.average_precision())
+        avg_recs.append(result.average_recall())
+        avg_F1s.append(result.average_F1())
 
         # true_negatives = 0
         # true_positives = 0
@@ -168,9 +249,19 @@ if __name__ == "__main__":
 
     hloss_mean, hloss_sd = merge_results(hlosses)
     oneerror_mean, oneerror_sd = merge_results(oneerrors)
+    coverage_mean, coverage_sd = merge_results(coverages)
+    rloss_mean, rloss_sd = merge_results(rlosses)
+    avg_prec_mean, avg_prec_sd = merge_results(avg_precs)
+    avg_rec_mean, avg_rec_sd = merge_results(avg_recs)
+    avg_F1_mean, avg_F1_sd = merge_results(avg_F1s)
 
     print "Hloss : ", hloss_mean, " +/- " , hloss_sd
     print "Oneerror : ", oneerror_mean, " +/- " , oneerror_sd
+    print "Coverage : ", coverage_mean, " +/- " , coverage_sd
+    print "Rloss : ", rloss_mean, " +/- " , rloss_sd
+    print "AVGPrecision : ", avg_prec_mean, " +/- " , avg_prec_sd
+    print "AVGRecall : ", avg_rec_mean, " +/- " , avg_F1_mean
+    print "AVGF1 : ", avg_F1_mean, " +/- " , avg_F1_sd
 
     # plt.figure()
     # plt.title("H-loss")
