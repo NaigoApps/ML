@@ -15,6 +15,7 @@ import scipy.sparse as sp
 
 import miml_svm
 import prepareMIML
+from sklearn import metrics
 from LearningResult import LearningResult
 
 def save_sparse_csc(filename, array):
@@ -38,6 +39,16 @@ def extract_randomly(data,labels, percent):
 
 def merge_results(values):
     return np.average(values), np.std(values)
+
+def zero_based(labels):
+    result = np.zeros((len(labels), len(labels[0])))
+    for (r, prediction) in enumerate(labels):
+        for (c, label) in enumerate(prediction):
+            if label > 0:
+                result[r][c] = 1
+            else:
+                result[r][c] = 0
+    return result
 
 if __name__ == "__main__":
 
@@ -115,8 +126,11 @@ if __name__ == "__main__":
         print "Hloss... ", result.hamming_loss()
         print "Oneerror... ", result.one_error()
         print "Coverage... ", result.coverage()
+        print "Sklearn coverage -> ", metrics.coverage_error(zero_based(test_labels), predictions)
         print "Rank loss... ", result.ranking_loss()
+        print "Sklearn rank loss -> ", metrics.label_ranking_loss(zero_based(test_labels), predictions)
         print "Avg precision... ", result.average_precision()
+        print "Sklearn avg prec -> ", metrics.label_ranking_average_precision_score(zero_based(test_labels), predictions)
         print "Avg recall... ", result.average_recall()
         print "Avg F1... ", result.average_F1()
         hlosses.append(result.hamming_loss())
