@@ -19,6 +19,19 @@
 	Notice that each bag can be made of any number of instances, but every instance has a fixed number of features $f$.
 \end{frame}
 
+\subsection{SIL}
+\begin{frame}{SIL}
+	The first naive approach makes the following label assignment:
+	\begin{itemize}\setlength\itemsep{1em}
+		\item If an instance belongs to a negative bag sets its label is $-1$
+		\item If an instance belongs to a positive bag (wrongly) sets its label to $+1$
+	\end{itemize}
+	The resulting problem can be solved using a regular SVM, treating each instance as a whole document.
+	
+	Using this approach makes almost useless multi-instance formulation.
+\end{frame}
+
+
 \subsection{mi-SVM}
 \begin{frame}{mi-SVM}
 	Instances label assignment:
@@ -33,7 +46,7 @@
 
 \begin{frame}{mi-SVM}
 	Our SVM problem becames the following:
-	$$min_Y min_{w, \xi} \frac{1}{2} ||w||^2 + C \sum_{i = 1}{n}\xi^{(i)}$$
+	$$min_Y min_{w, \xi} \frac{1}{2} ||w||^2 + C \sum_{i = 1}^{n}\xi^{(i)}$$
 	$$y_k^{(i)} (w^T x_k^{(i)} + b) \geq 1 - \xi^{(i)} \ \forall i \in [1, n], k \in [1, k_i]$$
 	$$\xi^{(i)} \geq 0 \ \forall i \in [1, n]$$
 	$$y_k^{(i)} = -1 \ if \ Y^{(i)} = -1$$
@@ -59,7 +72,7 @@
 \subsection{MI-SVM}
 \begin{frame}{MI-SVM}
 	This approach uses directly the dataset in its bag form:
-	$$arg min_{w, \xi} \frac{1}{2} ||w||^2 + C \sum_{i = 1}{n}\xi^{(i)}$$
+	$$arg min_{w, \xi} \frac{1}{2} ||w||^2 + C \sum_{i = 1}^{n}\xi^{(i)}$$
 	$$y^{(i)} (max_k w^T x_k^{(i)} + b) \geq 1 - \xi^{(i)} \ \forall i \in [1, n]$$
 	$$\xi^{(i)} \geq 0 \ \forall i \in [1, n]$$
 	This is possible by selecting a \textit{witness} from each bag instances.
