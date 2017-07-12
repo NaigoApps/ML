@@ -21,13 +21,14 @@
 %\usepackage[framed,numbered,autolinebreaks,useliterate]{mcode}
 %\usepackage{ragged2e}
 
+\newcommand{\R}{\mathbb{R}}
 
 \title[MIML]{Multi Instance Multi Label}
 \titlegraphic{\includegraphics[height=2cm,width=2cm]{headers/logo-unifi}}
 %\author[M. Lapucci, A. Sortino]{Matteo Lapucci, Alessio Sortino}
 \institute[]{{\large Machine Learning}\\\vspace{0.3cm}\textit{University of Florence, Department of Information Engineering}}
 \author[L. Niccolai, F. Vittorini]
-{\parbox[c]{1.5in}{Lorenzo Niccolai\\\texttt{\tiny lorenzo.niccolai@stud.unifi.it}} \and 
+{\parbox[c]{1.5in}{Lorenzo Niccolai\\\texttt{\tiny lorenzo.niccolai3@stud.unifi.it}} \and 
 	\parbox[c]{1.5in}{Fabio Vittorini\\\texttt{\tiny fabio.vittorini@stud.unifi.it}}}
 \date{\today}
 \hypersetup{pdfauthor={Lorenzo Niccolai and Fabio Vittorini}}
@@ -37,6 +38,7 @@
 %		\tableofcontents[currentsection]
 %	\end{frame}
 %}
+
 
 \begin{document}
 	
@@ -52,17 +54,15 @@
 %----------------------------------------------------------------------------------------
 %	PRESENTATION SLIDES
 %----------------------------------------------------------------------------------------
+
 \begin{frame}{Overview}
 	\tableofcontents
 \end{frame}
 
-\section{Introduction}
-\begin{frame}{Introduction}
-	\begin{itemize}\setlength\itemsep{1em}
-		\item 
-		
-	\end{itemize}
-\end{frame}
-
+\input{sections/svm.tex}
+\input{sections/mi.tex}
+\input{sections/ml.tex}
+\input{sections/miml.tex}
+\input{sections/work.tex}
 	
 \end{document} 

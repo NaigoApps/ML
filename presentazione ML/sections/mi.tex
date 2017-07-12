@@ -1,0 +1,80 @@
+\section{Multi Instance Learning}
+ 
+\subsection{Introduction}
+\begin{frame}{Multi instance classification}
+	Motivation:
+	\begin{itemize}\setlength\itemsep{1em}
+		\item Sometimes a complex item can be well represented by a set of \textit{instances}
+		\item A single instance may belong or not to a class
+		\item An example is positive if at least one of its instances is positive, it's negative otherwise
+		\item Dataset labels are assigned to examples, not to instances
+		\item We have a \textit{semi-supervised learning} problem
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Notation}
+	Dataset is now a set of bags, where each bag is a set of instances:
+	$$D = \{(X^{(i)}, Y^{(i)}) | i \in [1, n]\}$$
+	$$X^{(i)} = \{x_k^{(i)} | k \in [1, k_i], x_k \in \R^f\}$$
+	Notice that each bag can be made of any number of instances, but every instance has a fixed number of features $f$.
+\end{frame}
+
+\subsection{mi-SVM}
+\begin{frame}{mi-SVM}
+	Instances label assignment:
+	\begin{itemize}\setlength\itemsep{1em}
+		\item If an instance belongs to a negative bag we can say that its label is $-1$
+		\item If an instance belongs to a positive bag we don't know its label
+	\end{itemize}
+	This leads to 2 new constraints in SVM problem:
+	$$y_k^{(i)} = -1 \ if \ Y^{(i)} = -1$$
+	$$\sum_{k = 1}^{k_i}\frac{y_k^{(i)} + 1}{2} \geq 1 \ if \ Y^{(i)} = +1$$
+\end{frame}
+
+\begin{frame}{mi-SVM}
+	Our SVM problem becames the following:
+	$$min_Y min_{w, \xi} \frac{1}{2} ||w||^2 + C \sum_{i = 1}{n}\xi^{(i)}$$
+	$$y_k^{(i)} (w^T x_k^{(i)} + b) \geq 1 - \xi^{(i)} \ \forall i \in [1, n], k \in [1, k_i]$$
+	$$\xi^{(i)} \geq 0 \ \forall i \in [1, n]$$
+	$$y_k^{(i)} = -1 \ if \ Y^{(i)} = -1$$
+	$$\sum_{k = 1}^{k_i}\frac{y_k^{(i)} + 1}{2} \geq 1 \ if \ Y^{(i)} = +1$$
+	That is an intractable mixed optimization problem
+\end{frame}
+
+\begin{frame}{Algorithm}
+	A feasible algorithm that finds a non optimal solution is the following:
+	\begin{enumerate}
+		\item $y_k^{(i)} = -1 \ if \ Y^{(i)} = -1$
+		\item $y_k^{(i)} = +1 \ if \ Y^{(i)} = +1$
+		\item do
+		\begin{enumerate}
+			\item Solve regular SVM finding $w$, $b$
+			\item $y_k^{(i)} = sign(w^T x_k^{(i)} + b) \ if \ Y^{(i)} = +1$
+			\item Adjust each positive bag to satisfy constraints
+		\end{enumerate}
+		\item while $y_k^{(i)}$ change
+	\end{enumerate}
+\end{frame}
+
+\subsection{MI-SVM}
+\begin{frame}{MI-SVM}
+	This approach uses directly the dataset in its bag form:
+	$$arg min_{w, \xi} \frac{1}{2} ||w||^2 + C \sum_{i = 1}{n}\xi^{(i)}$$
+	$$y^{(i)} (max_k w^T x_k^{(i)} + b) \geq 1 - \xi^{(i)} \ \forall i \in [1, n]$$
+	$$\xi^{(i)} \geq 0 \ \forall i \in [1, n]$$
+	This is possible by selecting a \textit{witness} from each bag instances.
+\end{frame}
+
+\begin{frame}{Algorithm}
+	A feasible algorithm that finds a solution is the following:
+	\begin{enumerate}
+		\item $x_s^{(i)} = avg(x_k^{(i)}) \ \forall i \in [1, n]$
+		\item do
+		\begin{enumerate}
+			\item Solve regular SVM finding $w$, $b$, balancing lagrange multipliers
+			\item Find new $x_s^{(i)}$ by selecting the best one for each positive bag
+		\end{enumerate}
+		\item while witnesses change
+	\end{enumerate}
+\end{frame}
+

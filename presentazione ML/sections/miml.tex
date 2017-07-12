@@ -1,0 +1,74 @@
+\section{Multi Instance Multi Label Learning}
+ 
+\subsection{Introduction}
+\begin{frame}{Introduction to MIML}
+	MIML problems combine motivations of multi instance and multi label ones.
+	
+	Given a set of labels $L = \{y_1, y_2,... y_l\}$
+	$$D = \{(X_i, Y_i) | i \in [1, n]\}$$
+	$$X_i = \{x_{i,k} | k \in [1, k_i], x_{i,k} \in \R^f\}$$
+	$$Y_i = \{y_{i,h} | h \in [1, h_i], y_{i,h} \in L, h_i \leq l\}$$
+\end{frame}
+
+\begin{frame}{SVM Solution}
+	To allow regular SVMs to solve this problem, we use \textit{problem transformation}.
+	
+	There are 2 possibilities:
+	\begin{itemize}
+		\item MIML $\rightarrow$ MISL $\rightarrow$ SISL (used in this work)
+		\item MIML $\rightarrow$ SIML $\rightarrow$ SISL
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Multi label to single label}
+	
+\end{frame}
+
+\begin{frame}{mi-SVM}
+	Our SVM problem becames the following:
+	$$min_Y min_{w, \xi} \frac{1}{2} ||w||^2 + C \sum_{i = 1}{n}\xi^{(i)}$$
+	$$y_k^{(i)} (w^T x_k^{(i)} + b) \geq 1 - \xi^{(i)} \ \forall i \in [1, n], k \in [1, k_i]$$
+	$$\xi^{(i)} \geq 0 \ \forall i \in [1, n]$$
+	$$y_k^{(i)} = -1 \ if \ Y^{(i)} = -1$$
+	$$\sum_{k = 1}^{k_i}\frac{y_k^{(i)} + 1}{2} \geq 1 \ if \ Y^{(i)} = +1$$
+	That is an intractable mixed optimization problem
+\end{frame}
+
+\begin{frame}{Algorithm}
+	A feasible algorithm that finds a non optimal solution is the following:
+	\begin{enumerate}
+		\item $y_k^{(i)} = -1 \ if \ Y^{(i)} = -1$
+		\item $y_k^{(i)} = +1 \ if \ Y^{(i)} = +1$
+		\item do
+		\begin{enumerate}
+			\item Solve regular SVM finding $w$, $b$
+			\item $y_k^{(i)} = sign(w^T x_k^{(i)} + b) \ if \ Y^{(i)} = +1$
+			\item Adjust each positive bag to satisfy constraints
+		\end{enumerate}
+		\item while $y_k^{(i)}$ change
+	\end{enumerate}
+\end{frame}
+
+\subsection{MI-SVM}
+\begin{frame}{MI-SVM}
+	This approach uses directly the dataset in its bag form:
+	$$arg min_{w, \xi} \frac{1}{2} ||w||^2 + C \sum_{i = 1}{n}\xi^{(i)}$$
+	$$y^{(i)} (max_k w^T x_k^{(i)} + b) \geq 1 - \xi^{(i)} \ \forall i \in [1, n]$$
+	$$\xi^{(i)} \geq 0 \ \forall i \in [1, n]$$
+	This is possible by selecting a \textit{witness} from each bag instances.
+\end{frame}
+
+\begin{frame}{Algorithm}
+	A feasible algorithm that finds a solution is the following:
+	\begin{enumerate}
+		\item $x_s^{(i)} = avg(x_k^{(i)}) \ \forall i \in [1, n]$
+		\item do
+		\begin{enumerate}
+			\item Solve regular SVM finding $w$, $b$, balancing lagrange multipliers
+			\item Find new $x_s^{(i)}$ by selecting the best one for each positive bag
+		\end{enumerate}
+		\item while witnesses change
+	\end{enumerate}
+\end{frame}
+
+ 
