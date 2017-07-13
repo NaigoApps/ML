@@ -50,6 +50,25 @@ def zero_based(labels):
                 result[r][c] = 0
     return result
 
+def label_cardinality(test):
+    sum = 0.0
+    for doc in test:
+        for value in doc:
+            if value > 0:
+                sum += 1
+    return sum / len(test)
+
+def label_density(test):
+    sum = 0.0
+    for doc in test:
+        cur_sum = 0.0
+        for value in doc:
+            if value > 0:
+                cur_sum += 1
+        cur_sum /= len(doc)
+        sum += cur_sum
+    return sum / len(test)
+
 if __name__ == "__main__":
 
     if (len(sys.argv) == 2):
@@ -58,8 +77,8 @@ if __name__ == "__main__":
         config_file = None
     p = prepareMIML.PrepareMIML(config_file)
 
-    # dataset = p.arrayMatrixInstancesDictionary('./dataset/reut2-000.sgm')
-    dataset = p.arrayMatrixInstancesDictionary(None)
+    dataset = p.arrayMatrixInstancesDictionary('./dataset/reut2-000.sgm')
+    # dataset = p.arrayMatrixInstancesDictionary(None)
 
     # print dense_matrix[3] #matrice instanza dizionario del documento 3
     # print dense_matrix[3][2] #dizionario dell'instanza 2 del doc 3
@@ -109,6 +128,10 @@ if __name__ == "__main__":
     avg_precs = []
     avg_recs = []
     avg_F1s = []
+    cardinalities = []
+    densities = []
+    sk_avg_precs = []
+    sk_coverages = []
 
     times = 2
 
@@ -123,54 +146,29 @@ if __name__ == "__main__":
 
         result = LearningResult(predictions, test_labels)
 
+        print "LABEL CARDINALITY: ", label_cardinality(test_labels)
+        print "LABEL DENSITY: ", label_density(test_labels)
+
         print "Hloss... ", result.hamming_loss()
         print "Oneerror... ", result.one_error()
         print "Coverage... ", result.coverage()
         print "Sklearn coverage -> ", metrics.coverage_error(zero_based(test_labels), predictions)
         print "Rank loss... ", result.ranking_loss()
-        print "Sklearn rank loss -> ", metrics.label_ranking_loss(zero_based(test_labels), predictions)
         print "Avg precision... ", result.average_precision()
-        print "Sklearn avg prec -> ", metrics.label_ranking_average_precision_score(zero_based(test_labels), predictions)
+        print "Sklearn avg prec -> ", metrics.average_precision_score(zero_based(test_labels), predictions)
         print "Avg recall... ", result.average_recall()
         print "Avg F1... ", result.average_F1()
+        cardinalities.append(label_cardinality(test_labels))
+        densities.append(label_density(test_labels))
         hlosses.append(result.hamming_loss())
         oneerrors.append(result.one_error())
         coverages.append(result.coverage())
         rlosses.append(result.ranking_loss())
         avg_precs.append(result.average_precision())
+        sk_avg_precs.append(metrics.average_precision_score(zero_based(test_labels), predictions))
+        sk_coverages.append(metrics.coverage_error(zero_based(test_labels), predictions))
         avg_recs.append(result.average_recall())
         avg_F1s.append(result.average_F1())
-
-        # true_negatives = 0
-        # true_positives = 0
-        # false_negatives = 0
-        # false_positives = 0
-        # for i, prediction in enumerate(predictions):
-        #     for j, predicted_label in enumerate(prediction):
-        #
-        #         if predicted_label < 0 and labels[i][j] < 0:
-        #             true_negatives += 1
-        #         if predicted_label > 0 and labels[i][j] > 0:
-        #             true_positives += 1
-        #         if predicted_label < 0 < labels[i][j]:
-        #             false_negatives += 1
-        #         if labels[i][j] < 0 < predicted_label:
-        #             false_positives += 1
-        # print "True positives: ", true_positives
-        # print "True negatives: ", true_negatives
-        # print "False positives: ", false_positives
-        # print "False negatives: ", false_negatives
-        # accuracy = float(true_negatives + true_positives) \
-        #            / (true_negatives + true_positives + false_negatives + false_positives + 1)
-        # precision = float(true_positives) / (true_positives + false_positives + 1)
-        # recall = float(true_positives) / (true_positives + false_negatives + 1)
-        # print "Accuracy: ", accuracy
-        # print "Precision: ", precision
-        # print "Recall: ", recall
-
-        # accuracies.append(accuracy)
-        # precisions.append(precision)
-        # recalls.append(recall)
 
     hloss_mean, hloss_sd = merge_results(hlosses)
     oneerror_mean, oneerror_sd = merge_results(oneerrors)
@@ -179,14 +177,22 @@ if __name__ == "__main__":
     avg_prec_mean, avg_prec_sd = merge_results(avg_precs)
     avg_rec_mean, avg_rec_sd = merge_results(avg_recs)
     avg_F1_mean, avg_F1_sd = merge_results(avg_F1s)
-
-    print "Hloss : ", hloss_mean, " +/- " , hloss_sd
-    print "Oneerror : ", oneerror_mean, " +/- " , oneerror_sd
-    print "Coverage : ", coverage_mean, " +/- " , coverage_sd
-    print "Rloss : ", rloss_mean, " +/- " , rloss_sd
-    print "AVGPrecision : ", avg_prec_mean, " +/- " , avg_prec_sd
-    print "AVGRecall : ", avg_rec_mean, " +/- " , avg_F1_mean
-    print "AVGF1 : ", avg_F1_mean, " +/- " , avg_F1_sd
+    sk_avg_prec_mean, sk_avg_prec_sd = merge_results(sk_avg_precs)
+    sk_coverage_mean, sk_coverage_sd = merge_results(sk_coverages)
+    cardinality_mean, cardinality_sd = merge_results(cardinalities)
+    density_mean, density_sd = merge_results(densities)
+    print "\n\n\n"
+    print "               Hloss : ", hloss_mean, " +/- " , hloss_sd
+    print "       Label density : ", density_mean, " +/- " , density_sd
+    print "   Label cardinality : ", cardinality_mean, " +/- " , cardinality_sd
+    print "            Oneerror : ", oneerror_mean, " +/- " , oneerror_sd
+    print "            Coverage : ", coverage_mean, " +/- " , coverage_sd
+    print "    SKlearn Coverage : ", sk_coverage_mean, " +/- " , sk_coverage_sd
+    print "               Rloss : ", rloss_mean, " +/- " , rloss_sd
+    print "        AVGPrecision : ", avg_prec_mean, " +/- " , avg_prec_sd
+    print "SKLearn AVGPrecision : ", sk_avg_prec_mean, " +/- " , sk_avg_prec_sd
+    print "           AVGRecall : ", avg_rec_mean, " +/- " , avg_rec_sd
+    print "               AVGF1 : ", avg_F1_mean, " +/- " , avg_F1_sd
 
     # plt.figure()
     # plt.title("H-loss")

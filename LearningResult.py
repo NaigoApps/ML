@@ -85,6 +85,7 @@ class Labels:
         for label in self._not_predicted_labels:
             if label.getId() == id:
                 return label
+        return None
 
     def actual_count(self):
         return len(self._actual_labels)
@@ -147,27 +148,31 @@ class LearningResult:
     def average_precision(self):
         sum = 0.0
         for labels in self._labels:
-            cur_sum = 0.0
-            for pos_label in labels._actual_labels:
-                for pos_label_1 in labels._actual_labels:
-                    if labels.findLabel(pos_label_1.getId()).getRank() <= labels.findLabel(pos_label.getId()).getRank():
-                        cur_sum += 1
-                cur_sum /= labels.findLabel(pos_label.getId()).getRank()
-            if cur_sum > 0:
+            if len(labels._actual_labels) > 0:
+                cur_sum = 0.0
+                for pos_label in labels._actual_labels:
+                    for pos_label_1 in labels._actual_labels:
+                        if labels.findLabel(pos_label_1.getId()).getRank() <= labels.findLabel(pos_label.getId()).getRank():
+                            cur_sum += 1
+                    cur_sum /= labels.findLabel(pos_label.getId()).getRank()
                 cur_sum /= len(labels._actual_labels)
                 sum += cur_sum
+            else:
+                sum += 1
         return sum / len(self._labels)
 
     def average_recall(self):
         sum = 0.0
         for labels in self._labels:
-            cur_sum = 0.0
-            for label in labels._actual_labels:
-                if labels.findLabel(label.getId()).getRank() <= len(labels._predicted_labels):
-                    cur_sum += 1
-            if cur_sum > 0:
+            if len(labels._actual_labels) > 0:
+                cur_sum = 0.0
+                for label in labels._actual_labels:
+                    if labels.findLabel(label.getId()).getPredicted() > 0:
+                        cur_sum += 1
                 cur_sum /= len(labels._actual_labels)
                 sum += cur_sum
+            else:
+                sum += 1
         return sum / len(self._labels)
 
     def average_F1(self):
