@@ -23,11 +23,11 @@
 \begin{frame}{SIL}
 	The first naive approach makes the following label assignment:
 	\begin{itemize}\setlength\itemsep{1em}
-		\item If an instance belongs to a negative bag sets its label is $-1$
-		\item If an instance belongs to a positive bag (wrongly) sets its label to $+1$
+		\item If an instance belongs to a negative bag, sets its label is (\color{red}to? \color{black})$-1$
+		\item If an instance belongs to a positive bag (wrongly) sets its label to $+1$ \color{red} che vuol dire?
 	\end{itemize}
-	The resulting problem can be solved using a regular SVM, treating each instance as a whole document.
-	
+	The resulting problem can be solved using a regular SVM, treating each instance as a whole document.\\
+	\vspace{12px}
 	Using this approach makes almost useless multi-instance formulation.
 \end{frame}
 
@@ -37,8 +37,9 @@
 	Instances label assignment:
 	\begin{itemize}\setlength\itemsep{1em}
 		\item If an instance belongs to a negative bag we can say that its label is $-1$
-		\item If an instance belongs to a positive bag we don't know its label
+		\item If an instance belongs to a positive bag we don't know for sure its label
 	\end{itemize}
+	\vspace{12px}
 	This leads to 2 new constraints in SVM problem:
 	$$y_k^{(i)} = -1 \ if \ Y^{(i)} = -1$$
 	$$\sum_{k = 1}^{k_i}\frac{y_k^{(i)} + 1}{2} \geq 1 \ if \ Y^{(i)} = +1$$
@@ -56,17 +57,19 @@
 
 \begin{frame}{Algorithm}
 	A feasible algorithm that finds a non optimal solution is the following:
-	\begin{enumerate}
-		\item $y_k^{(i)} = -1 \ if \ Y^{(i)} = -1$
-		\item $y_k^{(i)} = +1 \ if \ Y^{(i)} = +1$
-		\item do
-		\begin{enumerate}
-			\item Solve regular SVM finding $w$, $b$
-			\item $y_k^{(i)} = sign(w^T x_k^{(i)} + b) \ if \ Y^{(i)} = +1$
-			\item Adjust each positive bag to satisfy constraints
-		\end{enumerate}
-		\item while $y_k^{(i)}$ change
-	\end{enumerate}
+	
+	\begin{codebox}
+		\Procname{$\proc{mi-SVM}\left(X, Y\right)$}
+		\li $y_k^{(i)} = -1 \ if \ Y^{(i)} = -1$
+		\li $y_k^{(i)} = +1 \ if \ Y^{(i)} = +1$
+		\li \textbf{do} \Do
+		\li Solve regular SVM finding $w$, $b$
+		\li $y_k^{(i)} = sign(w^T x_k^{(i)} + b) \ if \ Y^{(i)} = +1$
+		\li Adjust each positive bag to satisfy constraints \End
+		\li \While($y_k^{(i)}$ change)
+		
+	\end{codebox}
+	
 \end{frame}
 
 \subsection{MI-SVM}
@@ -80,6 +83,17 @@
 
 \begin{frame}{Algorithm}
 	A feasible algorithm that finds a solution is the following:
+	
+	\begin{codebox}
+		\Procname{$\proc{MI-SVM}\left(X, Y\right)$}
+		\li $x_s^{(i)} = avg(x_k^{(i)}) \ \forall i \in [1, n]$
+		\li \textbf{do} \Do
+		\li Solve regular SVM finding $w$, $b$, balancing lagrange multipliers
+		\li Find new $x_s^{(i)}$ by selecting the best one for each positive bag \End
+		\li \While(witnesses change)
+		
+	\end{codebox}
+	
 	\begin{enumerate}
 		\item $x_s^{(i)} = avg(x_k^{(i)}) \ \forall i \in [1, n]$
 		\item do

@@ -2,26 +2,26 @@
 \subsection{Classification}
 \begin{frame}{Binary classification}
 	\begin{itemize}\setlength\itemsep{1em}
-		\item[Goal:]To produce a classifier able to decide whether an object belongs to one or more classes.
+		\item[Goal:] To produce a classifier able to decide whether an object belongs to one or more classes.
 		\item[Idea:] Supervised Learning: Given a dataset of already classified examples, the classifier \textit{learns} a function that solves classification problem.
 	\end{itemize}
 \end{frame}
 
 \begin{frame}{Notation}
 	\begin{itemize}\setlength\itemsep{1em}
-		\item Example: A vector $x \in \mathbb{R}^f$. It represent an object using $f$ \textit{relevant} features.
-		\item Example label: A vector $y \in \{-1 , +1\}^l$ indicating wether the example belong to each of the $l$ classes.
+		\item A vector $x \in \mathbb{R}^f$ represents an object using $f$ \textit{relevant} features.
+		\item A vector $y \in \{-1 , +1\}^l$ indicates wether the example belong to each of the $l$ label classes.
 	\end{itemize}
-	Input of a classification problem is a dataset $D = \{X, Y\}$ where $X$ is a set of examples and $Y$ is a set of labels. $|X| = |Y| = n$.
+	The input of a classification problem is a dataset $D = \{X, Y\}$ where $X \in \mathbb{R}^{x\times f}$ is a set of examples and $Y \in \mathbb{R}^{n\times l}$ is a set of labels.
 	
-	While learning the target function, dataset is divided in \textit{training set} and \textit{test set}.
+	While learning the target function, the dataset is divided in \textit{training set} and \textit{test set}.
 \end{frame}
 
 \subsection{SVM idea}
 
 \begin{frame}{SVM idea}
 	\begin{itemize}\setlength\itemsep{1em}
-		\item For 1-class problems compute the \textit{maximum-margin hyperplane} $w^Tx + b$ which best separates positive examples from negative examples.
+		\item For 1-class problems we have to compute the \textit{maximum-margin hyperplane} $w^Tx + b$ which best separates positive examples from negative examples.
 	\end{itemize}
 	Optimization problem is:
 	$$arg min_w \frac{1}{2} ||w||^2$$
@@ -30,7 +30,7 @@
 
 \begin{frame}{SVM idea}
 	\begin{itemize}\setlength\itemsep{1em}
-		\item Examples may not be linearly serparable, so we introduce slack variables $\xi$
+		\item The examples may not be linearly serparable and so the problem would not have any solutions because constraints are not satisfied. Then we introduce slack variables $\xi$
 	\end{itemize}
 	Optimization problem becames:
 	$$arg min_{w, \xi} \frac{1}{2} ||w||^2 + C \sum_{i = 1}{n}\xi^{(i)}$$
