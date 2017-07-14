@@ -5,9 +5,13 @@
 	MIML problems combine motivations of multi instance and multi label ones.
 	
 	Given a set of labels $L = \{y_1, y_2,... y_l\}$
+	$$X_i = \{x_{i,k} | k \in [1, k_i], x_{i,k} \in \R^f\} Y_i = \{y_{i,h} | h \in [1, h_i], y_{i,h} \in L, h_i \leq l\}$$
 	$$D = \{(X_i, Y_i) | i \in [1, n]\}$$
-	$$X_i = \{x_{i,k} | k \in [1, k_i], x_{i,k} \in \R^f\}$$
-	$$Y_i = \{y_{i,h} | h \in [1, h_i], y_{i,h} \in L, h_i \leq l\}$$
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[scale = 0.25]{./images/confronto-miml.png}
+		
+	\end{figure}
 \end{frame}
 
 \begin{frame}{SVM Solution}
@@ -18,6 +22,11 @@
 		\item MIML $\rightarrow$ MISL $\rightarrow$ SISL (used in this work)
 		\item MIML $\rightarrow$ SIML $\rightarrow$ SISL
 	\end{itemize}
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[scale = 0.40]{./images/2-metodi.png}
+		
+	\end{figure}
 \end{frame}
 
 \begin{frame}{Multi label to single label}

@@ -24,8 +24,22 @@
 		\item For 1-class problems we have to compute the \textit{maximum-margin hyperplane} $w^Tx + b$ which best separates positive examples from negative examples.
 	\end{itemize}
 	Optimization problem is:
-	$$arg min_w \frac{1}{2} ||w||^2$$
-	$$y^{(i)} (w^T x^{(i)} + b) \geq 1 \ \forall i \in [1, n]$$
+	\begin{columns}
+		\begin{column}{0.5\textwidth}\centering
+			$$arg min_w \frac{1}{2} ||w||^2$$
+			$$y^{(i)} (w^T x^{(i)} + b) \geq 1 \ \forall i \in [1, n]$$
+		\end{column}
+		\begin{column}{0.5\textwidth}\centering
+			\begin{figure}[htbp]
+				\centering
+				\includegraphics[scale = 0.40]{./images/optimal-hyperplane2.png}
+				
+			\end{figure}
+		\end{column}
+	\end{columns}
+	
+	
+	
 \end{frame}
 
 \begin{frame}{SVM idea}

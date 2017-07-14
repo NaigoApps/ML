@@ -23,9 +23,10 @@
 \begin{frame}{SIL}
 	The first naive approach makes the following label assignment:
 	\begin{itemize}\setlength\itemsep{1em}
-		\item If an instance belongs to a negative bag, sets its label is (\color{red}to? \color{black})$-1$
-		\item If an instance belongs to a positive bag (wrongly) sets its label to $+1$ \color{red} che vuol dire?
+		\item If an instance belongs to a negative bag, sets its label to $-1$
+		\item If an instance belongs to a positive bag, sets its label to $+1$
 	\end{itemize}
+	\vspace{5px}
 	The resulting problem can be solved using a regular SVM, treating each instance as a whole document.\\
 	\vspace{12px}
 	Using this approach makes almost useless multi-instance formulation.
@@ -94,14 +95,5 @@
 		
 	\end{codebox}
 	
-	\begin{enumerate}
-		\item $x_s^{(i)} = avg(x_k^{(i)}) \ \forall i \in [1, n]$
-		\item do
-		\begin{enumerate}
-			\item Solve regular SVM finding $w$, $b$, balancing lagrange multipliers
-			\item Find new $x_s^{(i)}$ by selecting the best one for each positive bag
-		\end{enumerate}
-		\item while witnesses change
-	\end{enumerate}
 \end{frame}
 
