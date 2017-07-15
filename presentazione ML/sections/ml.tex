@@ -17,9 +17,24 @@
 \begin{frame}{Notation}
 	A set of labels $L = \{y_1, y_2,... y_l\}$ is given.\\
 	Each object contained in the dataset is associated with a set of labels:
-	$$D = \{(X_i, Y_i | i \in [1, n]\}$$
-	$$X_i \in \R^f$$
-	$$Y_i = \{y_{i,h} | h \in [1, h_i], y_{i,h} \in L, h_i \leq l\}$$
+	\begin{columns}
+		\begin{column}{0.5\textwidth}\centering
+		$$D = \{(X_i, Y_i | i \in [1, n]\}$$
+		$$X_i \in \R^f$$
+		$$Y_i = \{y_{i,h} | h \in [1, h_i], y_{i,h} \in L, h_i \leq l\}$$
+		\end{column}
+		\begin{column}{0.5\textwidth}\centering
+		\begin{figure}[htbp]
+			\centering
+			\includegraphics[scale = 0.3]{./images/ml1.png}
+			\caption{\textit{Multi label example}}
+		\end{figure}
+		\end{column}
+	\end{columns}
+	
+	
+	\color{red}IMMAGINE ML?
+	
 \end{frame}
 
 \begin{frame}{Problem transformation}
@@ -43,6 +58,8 @@
 	Sometimes they use problem transformation at the core.
 	
 	An example using SVM-related approach based on ranking and label set size prediction.
+	
+	\color{red}???
 \end{frame}
 
 \begin{frame}{Another multi label approch}

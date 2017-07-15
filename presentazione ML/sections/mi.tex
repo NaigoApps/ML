@@ -17,9 +17,11 @@
 
 \begin{frame}{Notation}
 	Dataset is now a set of bags, where each bag is a set of instances:
-	$$D = \{(X_i, Y_i) | i \in [1, n]\}$$
-	$$X_i = \{x_{i,k} | k \in [1, k_i], x_{i,k} \in \R^f\}$$
+	$$D = \{(X_i, Y_i) | \ i \in [1, n]\}$$
+	$$X_i = \{x_{i,k} | \ k \in [1, k_i], x_{i,k} \in \R^f\}$$
 	Notice that each bag can be made of any number of instances, but every instance has a fixed number of features $f$.
+	
+	\color{red}IMMAGINE MI?
 \end{frame}
 
 \subsection{SIL}
@@ -64,13 +66,13 @@
 	
 	\begin{codebox}
 		\Procname{$\proc{mi-SVM}\left(X, Y\right)$}
-		\li $y_k^{(i)} = -1 \ if \ Y^{(i)} = -1$
-		\li $y_k^{(i)} = +1 \ if \ Y^{(i)} = +1$
+		\li $y_{i,k} = -1 \ if \ Y_i = -1$
+		\li $y_{i,k} = +1 \ if \ Y_i = +1$
 		\li \textbf{do} \Do
 		\li Solve regular SVM finding $w$, $b$
-		\li $y_k^{(i)} = sign(w^T x_k^{(i)} + b) \ if \ Y^{(i)} = +1$
+		\li $y_{i,k} = sign(w^T x_{i,k} + b) \ if \ Y_i = +1$
 		\li Adjust each positive bag to satisfy constraints \End
-		\li \While($y_k^{(i)}$ change)
+		\li \While($y_{i,k}$ change)
 		
 	\end{codebox}
 	
@@ -79,9 +81,9 @@
 \subsection{MI-SVM}
 \begin{frame}{MI-SVM}
 	This approach uses directly the dataset in its bag form:
-	$$arg min_{w, \xi} \frac{1}{2} ||w||^2 + C \sum_{i = 1}^{n}\xi^{(i)}$$
-	$$y^{(i)} (max_k w^T x_k^{(i)} + b) \geq 1 - \xi^{(i)} \ \forall i \in [1, n]$$
-	$$\xi^{(i)} \geq 0 \ \forall i \in [1, n]$$
+	$$arg min_{w, \xi} \frac{1}{2} ||w||^2 + C \sum_{i = 1}^{n}\xi_i$$
+	$$y_i (max_k w^T x_{i,k} + b) \geq 1 - \xi_i \ \forall i \in [1, n]$$
+	$$\xi_i \geq 0 \ \forall i \in [1, n]$$
 	This is possible by selecting a \textit{witness} from each bag instances.
 \end{frame}
 

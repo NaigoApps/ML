@@ -2,36 +2,49 @@
 
 \subsection*{Introduction}
 \begin{frame}{Our work}
-	The aim of our work is to replicate the results of \cite{miml1} using the \textbf{MIML framework} and compare the different metrics.\\
+	The aim of our work is to replicate a part of the results of \cite{miml1} using the \textbf{MIML framework} and compare the different metrics.\\
 	\vspace{12px}
 	\begin{itemize}
+		\item We focused on the \textit{text categorization} using text documents (\textit{bags}) belonging to categories (\textit{labels})
 		\item We have choose to use the \textsc{MimlBoost} solution using multi-instance learning as the bridge
+		\item ... ALTRO?
 	\end{itemize}
 	
 	
 \end{frame}
 \begin{frame}{Issues}
-	
+	CI SI METTE?
 	
 \end{frame}
 
-\subsection{Compare results}
-\begin{frame}{Metrics}
-	Five criteria are used for evaluating the performances:
+\subsection{Results}
+\begin{frame}{Evaluation criteria}
+	Four criteria are used for evaluating the performances:
 	\begin{itemize}
-		\item hamming loss: $hloss_S(h) = \dfrac{1}{p}\sum_{i=1}^{p}\frac{1}{|\mathcal{Y}|}|h(X_i)\Delta Y_i|$ 
-		\item one-error: $one-error_S(h)=\dfrac{1}{p}\sum_{i=1}^{p}[[\arg \max_{y \in \mathcal{Y}} h(X_i,y)]\notin Y_i]$
-		\item coverage: $coverage_S(h)=\dfrac{1}{p}\sum_{i=1}^{p}\max_{y \in Y_i}rank^h(X_i,y)-1$
-		\item ranking loss: $rloss_S(h) = \dfrac{1}{p}\sum_{i=1}^{p}\frac{1}{|Y_i||\bar{Y_i}|}|{(y_1,y_2) \mid}h(X_i,y_1)\leq \ h(X_i,y_2), (y_1,y_2) \in Y_i \times \bar{Y_i} |$
-		\item average precision: 
+		\item \textbf{hamming loss}: $hloss_S(h) = \dfrac{1}{p}\sum_{i=1}^{p}\frac{1}{|\mathcal{Y}|}|h(X_i)\Delta Y_i|$ \\ where $\Delta$ stands for the symmetric difference between two sets
+		\item \textbf{one-error}: $one-error_S(h)=\dfrac{1}{p}\sum_{i=1}^{p}[[\arg \max_{y \in \mathcal{Y}} h(X_i,y)]\notin Y_i]$
+		\item \textbf{coverage}: $coverage_S(h)=\dfrac{1}{p}\sum_{i=1}^{p}\max_{y \in Y_i}rank^h(X_i,y)-1$
+		\item \textbf{ranking loss}: $rloss_S(h) = \dfrac{1}{p}\sum_{i=1}^{p}\frac{1}{|Y_i||\bar{Y_i}|}|{(y_1,y_2) \mid}h(X_i,y_1)\leq \ h(X_i,y_2), (y_1,y_2) \in Y_i \times \bar{Y_i} |$ \\ where $\bar{Y_i}$ denotes the complementary
+		set of $Y_i$ in $\mathcal{Y}$
 	\end{itemize}
 \end{frame}
 
 \begin{frame}{More metrics}
-	We have also used other metrics...
+	\color{red}We have also used other metrics... NEWS
+	\begin{itemize}
+	\item \textbf{average precision}: $avgprec_S(h) = \dfrac{1}{p}\sum_{i=1}^{p}\frac{1}{|Y_i|}\sum_{y \in Y_i} \dfrac{| \{ y' \mid rank^h(X_i,y') \leq rank^h(X_i,y), \ y' \in Y_i) \} |}{rank^h(X_i,y)}$
+	\item \textbf{average recall}: $avgrecl_S(h) = \dfrac{1}{p}\sum_{i=1}^{p} \dfrac{| \{ y \mid rank^h(X_i,y) \leq |h(X_i)|, \ y \in Y_i) \} |}{|Y_i|}$
+	\item \textbf{average F1}: $avgF1_S(h) = \dfrac{2\times avgprec_S(h)\times avgrecl_S(h)}{avgprec_S(h)+avgrecl_S(h)}$
+	\end{itemize}
 	\begin{flushright}
 		\cite{metrics}
 	\end{flushright}
+\end{frame}
+
+\begin{frame}{Test}
+	We have implement a \textit{text categorization} using the dataset \textsc{Reuters-21578} selecting \textbf{7} most frequent categories on \textbf{2000} best documents removing texts that do not have labels or that have a few words.
+	
+	\color{red} COSA AGGIUNGERE?
 \end{frame}
 
 \begin{frame}{Results}
@@ -39,5 +52,5 @@
 \end{frame}
 
 \begin{frame}{Future works}
-	
+	CI SI METTE? IO DIREI DI NO
 \end{frame}

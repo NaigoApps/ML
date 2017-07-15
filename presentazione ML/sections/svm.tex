@@ -26,7 +26,7 @@
 	\begin{columns}
 		\begin{column}{0.5\textwidth}\centering
 			$$arg min_w \frac{1}{2} ||w||^2$$
-			$$y^{(i)} (w^T x^{(i)} + b) \geq 1 \ \forall i \in [1, n]$$
+			$$y_i (w^T x_i + b) \geq 1 \ \forall i \in [1, n]$$
 		\end{column}
 		\begin{column}{0.5\textwidth}\centering
 			\begin{figure}[htbp]
@@ -49,8 +49,8 @@
 	\begin{columns}
 		\begin{column}{0.5\textwidth}\centering
 			$$arg min_{w, \xi} \frac{1}{2} ||w||^2 + C \sum_{i = 1}{n}\xi^{(i)}$$
-			$$y^{(i)} (w^T x^{(i)} + b) \geq 1 - \xi^{(i)} \ \forall i \in [1, n]$$
-			$$\xi^{(i)} \geq 0 \ \forall i \in [1, n]$$
+			$$y_i (w^T x_i + b) \geq 1 - \xi_i \ \forall i \in [1, n]$$
+			$$\xi_i \geq 0 \ \forall i \in [1, n]$$
 		\end{column}
 		\begin{column}{0.5\textwidth}\centering
 			\begin{figure}[htbp]
