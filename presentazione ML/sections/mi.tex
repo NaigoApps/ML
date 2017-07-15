@@ -4,10 +4,11 @@
 \begin{frame}{Multi instance classification}
 	Motivation:
 	\begin{itemize}\setlength\itemsep{1em}
-		\item Sometimes a complex item can be well represented by a set of \textit{instances}
-		\item A single instance may belong or not to a class
-		\item An example is positive if at least one of its instances is positive, it's negative otherwise
-		\item Dataset labels are assigned to examples, not to instances
+		\item Sometimes a complex item can be well represented by a set of \textit{features} or \textit{instances}
+		\item A single instance may belong or not to a class or \textit{label} (positive or negative)
+		\item An example, or \textit{bag}, is positive if at least one of its instances is positive (it is called \textit{witness}), where as a negative bag consists of only negative instances
+		\item A label is provided for the
+		entire bag, not to instances
 		\item We have a \textit{semi-supervised learning} problem
 	\end{itemize}
 	\begin{flushright}
@@ -20,7 +21,11 @@
 	$$D = \{(X_i, Y_i) | \ i \in [1, n]\}$$
 	$$X_i = \{x_{i,k} | \ k \in [1, k_i], x_{i,k} \in \R^f\}$$
 	Notice that each bag can be made of any number of instances, but every instance has a fixed number of features $f$.
-	
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[scale = 0.15]{./images/mi3.png}
+		\caption{\textit{Example of images instances refer to "zebra concept"}}
+	\end{figure}
 	\color{red}IMMAGINE MI?
 \end{frame}
 
@@ -84,7 +89,7 @@
 	$$arg min_{w, \xi} \frac{1}{2} ||w||^2 + C \sum_{i = 1}^{n}\xi_i$$
 	$$y_i (max_k w^T x_{i,k} + b) \geq 1 - \xi_i \ \forall i \in [1, n]$$
 	$$\xi_i \geq 0 \ \forall i \in [1, n]$$
-	This is possible by selecting a \textit{witness} from each bag instances.
+	This is possible by selecting a \textit{witness} from each bag instance.
 \end{frame}
 
 \begin{frame}{MI-SVM algorithm}
@@ -102,5 +107,16 @@
 		
 	\end{codebox}
 	
+\end{frame}
+
+\begin{frame}{Other common frameworks for MI}
+	In addition to these methods we can cite:
+	\begin{itemize}
+		\item \textbf{Diverse density (DD)}: DD COMPLICATO
+		\item \textbf{EM-DD}: COMPLICATO
+		\item \textbf{Citation kNN}: documento OKOK
+		\item \textbf{MIL Random forest (MIL RF)}: PAGAMENTO
+		\item \textbf{MBSTAR}: MicroRNA
+	\end{itemize}
 \end{frame}
 
