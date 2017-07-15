@@ -2,7 +2,12 @@
 
 \subsection*{Introduction}
 \begin{frame}{Our work}
-	The aim of our work is to replicate the results of \cite{miml1} using the \textbf{MIML framework} ?and improve? and compare the different metrics.
+	The aim of our work is to replicate the results of \cite{miml1} using the \textbf{MIML framework} and compare the different metrics.\\
+	\vspace{12px}
+	\begin{itemize}
+		\item We have choose to use the \textsc{MimlBoost} solution using multi-instance learning as the bridge
+	\end{itemize}
+	
 	
 \end{frame}
 \begin{frame}{Issues}
@@ -12,7 +17,18 @@
 
 \subsection{Compare results}
 \begin{frame}{Metrics}
-	
+	Five criteria are used for evaluating the performances:
+	\begin{itemize}
+		\item hamming loss: $hloss_S(h) = \dfrac{1}{p}\sum_{i=1}^{p}\frac{1}{|\mathcal{Y}|}|h(X_i)\Delta Y_i|$ 
+		\item one-error: $one-error_S(h)=\dfrac{1}{p}\sum_{i=1}^{p}[[\arg \max_{y \in \mathcal{Y}} h(X_i,y)]\notin Y_i]$
+		\item coverage: $coverage_S(h)=\dfrac{1}{p}\sum_{i=1}^{p}\max_{y \in Y_i}rank^h(X_i,y)-1$
+		\item ranking loss: $rloss_S(h) = \dfrac{1}{p}\sum_{i=1}^{p}\frac{1}{|Y_i||\bar{Y_i}|}|{(y_1,y_2) \mid}h(X_i,y_1)\leq \ h(X_i,y_2), (y_1,y_2) \in Y_i \times \bar{Y_i} |$
+		\item average precision: 
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{More metrics}
+	We have also used other metrics...
 	\begin{flushright}
 		\cite{metrics}
 	\end{flushright}
