@@ -10,12 +10,13 @@
 		\item Dataset labels are assigned to examples, not to instances
 		\item We have a \textit{semi-supervised learning} problem
 	\end{itemize}
+	\cite{mi1}
 \end{frame}
 
 \begin{frame}{Notation}
 	Dataset is now a set of bags, where each bag is a set of instances:
-	$$D = \{(X^{(i)}, Y^{(i)}) | i \in [1, n]\}$$
-	$$X^{(i)} = \{x_k^{(i)} | k \in [1, k_i], x_k \in \R^f\}$$
+	$$D = \{(X_i, Y_i) | i \in [1, n]\}$$
+	$$X_i = \{x_{i,k} | k \in [1, k_i], x_{i,k} \in \R^f\}$$
 	Notice that each bag can be made of any number of instances, but every instance has a fixed number of features $f$.
 \end{frame}
 
@@ -42,17 +43,17 @@
 	\end{itemize}
 	\vspace{12px}
 	This leads to 2 new constraints in SVM problem:
-	$$y_k^{(i)} = -1 \ if \ Y^{(i)} = -1$$
-	$$\sum_{k = 1}^{k_i}\frac{y_k^{(i)} + 1}{2} \geq 1 \ if \ Y^{(i)} = +1$$
+	$$y_{i,k} = -1 \ if \ Y_i = -1$$
+	$$\sum_{k = 1}^{k_i}\frac{y_{i,k} + 1}{2} \geq 1 \ if \ Y_i = +1$$
 \end{frame}
 
 \begin{frame}{mi-SVM}
 	Our SVM problem becames the following:
-	$$min_Y min_{w, \xi} \frac{1}{2} ||w||^2 + C \sum_{i = 1}^{n}\xi^{(i)}$$
-	$$y_k^{(i)} (w^T x_k^{(i)} + b) \geq 1 - \xi^{(i)} \ \forall i \in [1, n], k \in [1, k_i]$$
-	$$\xi^{(i)} \geq 0 \ \forall i \in [1, n]$$
-	$$y_k^{(i)} = -1 \ if \ Y^{(i)} = -1$$
-	$$\sum_{k = 1}^{k_i}\frac{y_k^{(i)} + 1}{2} \geq 1 \ if \ Y^{(i)} = +1$$
+	$$min_Y min_{w, \xi} \frac{1}{2} ||w||^2 + C \sum_{i = 1}^{n}\xi_i$$
+	$$y_{i,k} (w^T x_{i,k} + b) \geq 1 - \xi_i \ \forall i \in [1, n], k \in [1, k_i]$$
+	$$\xi_i \geq 0 \ \forall i \in [1, n]$$
+	$$y_{i,k} = -1 \ if \ Y_i = -1$$
+	$$\sum_{k = 1}^{k_i}\frac{y_{i,k} + 1}{2} \geq 1 \ if \ Y_i = +1$$
 	That is an intractable mixed optimization problem
 \end{frame}
 
@@ -87,10 +88,12 @@
 	
 	\begin{codebox}
 		\Procname{$\proc{MI-SVM}\left(X, Y\right)$}
-		\li $x_s^{(i)} = avg(x_k^{(i)}) \ \forall i \in [1, n]$
+		\li $\bar{x}_i = avg(x_{i,k}) \ \forall x_{i,k} \in X_i$ positive bag
 		\li \textbf{do} \Do
-		\li Solve regular SVM finding $w$, $b$, balancing lagrange multipliers
-		\li Find new $x_s^{(i)}$ by selecting the best one for each positive bag \End
+		\li Assign $\bar{\alpha}_i \in [0,C]$ to each $\bar{x}_i$
+		\li Assign $\alpha_{i,j}$ with $\sum_{j=1}^{k_i}\alpha_{i,j} \in [0,C] \ \forall x_{i,k} \in X_i$ negative bag
+		\li Solve regular SVM finding $w$, $b$
+		\li Find new $\bar{x}_i$ by selecting the best one for each positive bag \End
 		\li \While(witnesses change)
 		
 	\end{codebox}

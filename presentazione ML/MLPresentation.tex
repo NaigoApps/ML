@@ -19,6 +19,8 @@
 \usepackage{pgfplots}
 
 \usepackage{clrscode3e}
+\usepackage{natbib}
+
 
 %\usepackage{array}
 %\usepackage[framed,numbered,autolinebreaks,useliterate]{mcode}
@@ -28,7 +30,6 @@
 
 \title[MIML]{Multi Instance Multi Label}
 \titlegraphic{\includegraphics[height=2cm,width=2cm]{headers/logo-unifi}}
-%\author[M. Lapucci, A. Sortino]{Matteo Lapucci, Alessio Sortino}
 \institute[]{{\large Machine Learning}\\\vspace{0.3cm}\textit{University of Florence, Department of Information Engineering}}
 \author[L. Niccolai, F. Vittorini]
 {\parbox[c]{1.5in}{Lorenzo Niccolai\\\texttt{\tiny lorenzo.niccolai3@stud.unifi.it}} \and 
@@ -67,5 +68,10 @@
 \input{sections/ml.tex}
 \input{sections/miml.tex}
 \input{sections/work.tex}
-	
+
+\begin{frame}{References}
+\bibliographystyle{plain}
+\bibliography{sections/bibliography}
+\end{frame}
+
 \end{document} 

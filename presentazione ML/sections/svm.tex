@@ -12,7 +12,7 @@
 		\item A vector $x \in \mathbb{R}^f$ represents an object using $f$ \textit{relevant} features.
 		\item A vector $y \in \{-1 , +1\}^l$ indicates wether the example belong to each of the $l$ label classes.
 	\end{itemize}
-	The input of a classification problem is a dataset $D = \{X, Y\}$ where $X \in \mathbb{R}^{x\times f}$ is a set of examples and $Y \in \mathbb{R}^{n\times l}$ is a set of labels.
+	The input of a classification problem is a dataset $D = \{X, Y\}$ where $X \in \mathbb{R}^{n\times f}$ is a set of examples and $Y \in \mathbb{R}^{n\times l}$ is a set of labels.
 	
 	While learning the target function, the dataset is divided in \textit{training set} and \textit{test set}.
 \end{frame}
@@ -33,7 +33,7 @@
 			\begin{figure}[htbp]
 				\centering
 				\includegraphics[scale = 0.40]{./images/optimal-hyperplane2.png}
-				
+				\caption{\textit{Solution of maximum-margin hyperplane}}
 			\end{figure}
 		\end{column}
 	\end{columns}
@@ -47,7 +47,19 @@
 		\item The examples may not be linearly serparable and so the problem would not have any solutions because constraints are not satisfied. Then we introduce slack variables $\xi$
 	\end{itemize}
 	Optimization problem becames:
-	$$arg min_{w, \xi} \frac{1}{2} ||w||^2 + C \sum_{i = 1}{n}\xi^{(i)}$$
-	$$y^{(i)} (w^T x^{(i)} + b) \geq 1 - \xi^{(i)} \ \forall i \in [1, n]$$
-	$$\xi^{(i)} \geq 0 \ \forall i \in [1, n]$$
+	\begin{columns}
+		\begin{column}{0.5\textwidth}\centering
+			$$arg min_{w, \xi} \frac{1}{2} ||w||^2 + C \sum_{i = 1}{n}\xi^{(i)}$$
+			$$y^{(i)} (w^T x^{(i)} + b) \geq 1 - \xi^{(i)} \ \forall i \in [1, n]$$
+			$$\xi^{(i)} \geq 0 \ \forall i \in [1, n]$$
+		\end{column}
+		\begin{column}{0.5\textwidth}\centering
+			\begin{figure}[htbp]
+				\centering
+				\includegraphics[scale = 0.15]{./images/slack2.png}
+				\caption{\textit{Solution with slacks}}
+			\end{figure}
+		\end{column}
+	\end{columns}
+	
 \end{frame}
