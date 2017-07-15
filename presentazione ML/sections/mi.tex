@@ -1,6 +1,6 @@
 \section{Multi Instance Learning}
  
-\subsection{Introduction}
+\subsection*{Introduction}
 \begin{frame}{Multi instance classification}
 	Motivation:
 	\begin{itemize}\setlength\itemsep{1em}
@@ -10,7 +10,9 @@
 		\item Dataset labels are assigned to examples, not to instances
 		\item We have a \textit{semi-supervised learning} problem
 	\end{itemize}
-	\cite{mi1}
+	\begin{flushright}
+		\cite{mi1}
+	\end{flushright}
 \end{frame}
 
 \begin{frame}{Notation}
@@ -57,7 +59,7 @@
 	That is an intractable mixed optimization problem
 \end{frame}
 
-\begin{frame}{Algorithm}
+\begin{frame}{mi-SVM algorithm}
 	A feasible algorithm that finds a non optimal solution is the following:
 	
 	\begin{codebox}
@@ -83,7 +85,7 @@
 	This is possible by selecting a \textit{witness} from each bag instances.
 \end{frame}
 
-\begin{frame}{Algorithm}
+\begin{frame}{MI-SVM algorithm}
 	A feasible algorithm that finds a solution is the following:
 	
 	\begin{codebox}

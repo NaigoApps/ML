@@ -1,5 +1,5 @@
 \section{SVM}
-\subsection{Classification}
+\subsection{Binary classification}
 \begin{frame}{Binary classification}
 	\begin{itemize}\setlength\itemsep{1em}
 		\item[Goal:] To produce a classifier able to decide whether an object belongs to one or more classes.
@@ -17,9 +17,8 @@
 	While learning the target function, the dataset is divided in \textit{training set} and \textit{test set}.
 \end{frame}
 
-\subsection{SVM idea}
-
-\begin{frame}{SVM idea}
+\subsection{SVM}
+\begin{frame}{SVM}
 	\begin{itemize}\setlength\itemsep{1em}
 		\item For 1-class problems we have to compute the \textit{maximum-margin hyperplane} $w^Tx + b$ which best separates positive examples from negative examples.
 	\end{itemize}
@@ -42,7 +41,7 @@
 	
 \end{frame}
 
-\begin{frame}{SVM idea}
+\begin{frame}{SVM with slacks}
 	\begin{itemize}\setlength\itemsep{1em}
 		\item The examples may not be linearly serparable and so the problem would not have any solutions because constraints are not satisfied. Then we introduce slack variables $\xi$
 	\end{itemize}
