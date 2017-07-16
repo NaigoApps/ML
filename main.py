@@ -133,7 +133,7 @@ if __name__ == "__main__":
     sk_avg_precs = []
     sk_coverages = []
 
-    times = 5
+    times = 4
 
     for tries in range(times):
         training_set = list(dataset)
