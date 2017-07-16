@@ -6,51 +6,118 @@
 	\vspace{12px}
 	\begin{itemize}
 		\item We focused on the \textit{text categorization} using text documents (\textit{bags}) belonging to categories (\textit{labels})
-		\item We have choose to use the \textsc{MimlBoost} solution using multi-instance learning as the bridge
-		\item ... ALTRO?
+		\item We choose to use the \textsc{MimlBoost} solution using multi-instance learning as the bridge between MIML and SISL
+		\item Bag of words approach to \textsc{Reuters-21578} dataset
+		\item Multi instance tasks solved with SIL, MI-SVM and mi-SVM approaches
+		\item Dataset was processed as follows
 	\end{itemize}
-	
-	
 \end{frame}
-\begin{frame}{Issues}
-	CI SI METTE?
-	
+
+\begin{frame}{Test}
+	Documents selection:
+	\begin{enumerate}
+		\item Removed every document with 0 labels
+		\item Removed short documents (less than 30 words)
+		\item Removed randomly documents with 1 label to obtain 2000 examples
+	\end{enumerate}
+	Dictionary creation:
+	\begin{enumerate}
+		\item Performed stemming
+		\item Removed stopwords
+		\item Removed rare words keeping $2\%$ of them (about 210)
+	\end{enumerate}
+	Multi instance data
+	\begin{enumerate}
+		\item Splitted documents in passages of 50 words max
+		\item Removed empty instances (according to dictionary)
+	\end{enumerate}
 \end{frame}
 
 \subsection{Results}
 \begin{frame}{Evaluation criteria}
-	Four criteria are used for evaluating the performances:
+	Four criteria are used for performance evaluation:
+	\begin{small}
+	
 	\begin{itemize}
-		\item \textbf{hamming loss}: $hloss_S(h) = \dfrac{1}{p}\sum_{i=1}^{p}\frac{1}{|\mathcal{Y}|}|h(X_i)\Delta Y_i|$ \\ where $\Delta$ stands for the symmetric difference between two sets
-		\item \textbf{one-error}: $one-error_S(h)=\dfrac{1}{p}\sum_{i=1}^{p}[[\arg \max_{y \in \mathcal{Y}} h(X_i,y)]\notin Y_i]$
-		\item \textbf{coverage}: $coverage_S(h)=\dfrac{1}{p}\sum_{i=1}^{p}\max_{y \in Y_i}rank^h(X_i,y)-1$
-		\item \textbf{ranking loss}: $rloss_S(h) = \dfrac{1}{p}\sum_{i=1}^{p}\frac{1}{|Y_i||\bar{Y_i}|}|{(y_1,y_2) \mid}h(X_i,y_1)\leq \ h(X_i,y_2), (y_1,y_2) \in Y_i \times \bar{Y_i} |$ \\ where $\bar{Y_i}$ denotes the complementary
-		set of $Y_i$ in $\mathcal{Y}$
+		\item \textbf{hamming loss}: 
+		$$hloss_S(h) = \dfrac{1}{p}\sum_{i=1}^{p}\frac{1}{|\mathcal{Y}|}|h(X_i)\Delta Y_i|$$
+		\item \textbf{one-error}: 
+		$$one-error_S(h)=\dfrac{1}{p}\sum_{i=1}^{p}[[\arg \max_{y \in \mathcal{Y}} h(X_i,y)]\notin Y_i]$$
+		\item \textbf{coverage}: 
+		$$coverage_S(h)=\dfrac{1}{p}\sum_{i=1}^{p}\max_{y \in Y_i}rank^h(X_i,y)-1$$
+		\item \textbf{ranking loss}: 
+		$$rloss_S(h) = \dfrac{1}{p}\sum_{i=1}^{p} \frac{1}{|Y_i| \cdot |\bar{Y_i}|}
+		| \{ (y_1,y_2) \in Y_i \times \bar{Y_i} \ s.t. \ h(X_i,y_1)\leq \ h(X_i,y_2) \} |$$
 	\end{itemize}
+	
+	\end{small}
 \end{frame}
 
 \begin{frame}{More metrics}
-	\color{red}We have also used other metrics... NEWS
+	Other metrics used by reference article:
+	\begin{small}
+	
 	\begin{itemize}
-	\item \textbf{average precision}: $avgprec_S(h) = \dfrac{1}{p}\sum_{i=1}^{p}\frac{1}{|Y_i|}\sum_{y \in Y_i} \dfrac{| \{ y' \mid rank^h(X_i,y') \leq rank^h(X_i,y), \ y' \in Y_i) \} |}{rank^h(X_i,y)}$
-	\item \textbf{average recall}: $avgrecl_S(h) = \dfrac{1}{p}\sum_{i=1}^{p} \dfrac{| \{ y \mid rank^h(X_i,y) \leq |h(X_i)|, \ y \in Y_i) \} |}{|Y_i|}$
-	\item \textbf{average F1}: $avgF1_S(h) = \dfrac{2\times avgprec_S(h)\times avgrecl_S(h)}{avgprec_S(h)+avgrecl_S(h)}$
+	\item \textbf{average precision}: 
+	$$avgprec_S(h) = \dfrac{1}{p}\sum_{i=1}^{p}\frac{1}{|Y_i|}\sum_{y \in Y_i} \dfrac{| \{ y' \mid rank^h(X_i,y') \leq rank^h(X_i,y), \ y' \in Y_i) \} |}{rank^h(X_i,y)}$$
+	\item \textbf{average recall}: 
+	$$avgrecl_S(h) = \dfrac{1}{p}\sum_{i=1}^{p} \dfrac{| \{ y \mid rank^h(X_i,y) \leq |h(X_i)|, \ y \in Y_i) \} |}{|Y_i|}$$
+	\item \textbf{average F1}: 
+	$$avgF1_S(h) = \dfrac{2\times avgprec_S(h)\times avgrecl_S(h)}{avgprec_S(h)+avgrecl_S(h)}$$
 	\end{itemize}
+	
+	\end{small}
 	\begin{flushright}
 		\cite{metrics}
 	\end{flushright}
 \end{frame}
 
-\begin{frame}{Test}
-	We have implement a \textit{text categorization} using the dataset \textsc{Reuters-21578} selecting \textbf{7} most frequent categories on \textbf{2000} best documents removing texts that do not have labels or that have a few words.
-	
-	\color{red} COSA AGGIUNGERE?
-\end{frame}
 
 \begin{frame}{Results}
-	
+\begin{tiny}
+	\begin{table}[]
+\centering
+\begin{tabular}{llllllll}
+\hline
+ & \multicolumn{7}{l}{Metrics} \\ \cline{2-8} 
+Algorithms & hloss & one-error & coverage & rloss & aveprec & averecl & aveF1 \\ \hline
+$MimlBoost$ & .053±.004 & .094±.014 & .387±.037 & .035±.005 & .937±.008 & .792±.010 & .858±.008 \\
+$MimlSvm$ & .033±.003 & .066±.011 & .313±.035 & .023±.004 & .956±.006 & .925±.010 & .940±.008 \\
+$MimlSvm_{mi}$ & .041±.004 & .055±.009 & .284±.030 & .020±.003 & .965±.005 & .921±.012 & .942±.007 \\
+$MimlNn$ & .038±.002 & .080±.010 & .320±.030 & .025±.003 & .950±.006 & .834±.011 & .888±.008 \\
+ &  &  &  &  &  &  &  \\
+$AdtBoost.MH$ &  .055±.005 & .120±.017 & .409±.047 & N/A & .926±.011 & N/A & N/A\\
+$RankSvm$ & .120±.013 & .196±.126 & .695±.466 & .085±.077 & .868±.092 & .411±.059 & .556±.068 \\
+$MlSvm$ & .050±.003 & .081±.011 & .329±.029 & .026±.003 & .949±.006 & .777±.016 & .854±.011\\
+$Ml-knn$ & .049±.003 & .126±.012 & .440±.035 & .045±.004 & .920±.007 & .821±.021 & .867±.013 \\
+ &  &  &  &  &  &  &  \\
+$SIL$ & .072±.002 & .129±.017 & .104±.036 & .025±.004 & .865±.012 & .797±.020 & .829±.016 \\
+$MISVM$ & .134±.004 & .015±.008 & .666±.054 & .214±.011 & .636±.019 & .425±.008 & .509±.011 \\
+$mi-SVM$ &  &  &  &  &  &  &  \\ \hline
+\end{tabular}
+\end{table}
+\end{tiny}
 \end{frame}
 
-\begin{frame}{Future works}
-	CI SI METTE? IO DIREI DI NO
+\begin{frame}{Considerations}
+	\begin{itemize}
+		\item Scores are quite low, but \textit{one-error} is low even if it's not a good metric for evaluating multilabel performance
+		\item Selected labels' frequencies are  520, 434, 283, 222, 223, 220, 187 over 2000 documents.
+		\item Test repeated for best 2 labels with following results
+	\end{itemize}
+
+\begin{tiny}
+	\begin{table}[]
+\centering
+\begin{tabular}{llllllll}
+\hline
+ & \multicolumn{7}{l}{Metrics} \\ \cline{2-8} 
+Algorithms & hloss & one-error & coverage & rloss & aveprec & averecl & aveF1 \\ \hline
+$SIL$ & .072±.002 & .129±.017 & .104±.036 & .025±.004 & .865±.012 & .797±.020 & .829±.016 \\
+$MISVM$ & .134±.004 & .015±.008 & .666±.054 & .214±.011 & .636±.019 & .425±.008 & .509±.011 \\
+$mi-SVM$ &  &  &  &  &  &  &  \\ \hline
+\end{tabular}
+\end{table}
+\end{tiny}
+
 \end{frame}
