@@ -7,7 +7,7 @@
 		\item Sometimes a complex item can be well represented by a set of \textit{labels}
 		\item Helps single label classification when the concept is more complicated or general
 	\end{itemize}
-	Solutions:
+	Solutions \cite{ml_approaches}:
 	\begin{itemize}\setlength\itemsep{1em}
 		\item Problem transformation
 		\item Algorithm adaptation
@@ -32,9 +32,6 @@
 		\end{column}
 	\end{columns}
 	
-	
-	\color{red}IMMAGINE ML?
-	
 \end{frame}
 
 \begin{frame}{Problem transformation}
@@ -52,19 +49,15 @@
 	\end{itemize}
 \end{frame}
 
-\begin{frame}{Algorithm adaptation}
-	Regular algorithms are modified to support multi-label tasks.
-	
-	Sometimes they use problem transformation at the core.
-	
-	An example using SVM-related approach based on ranking and label set size prediction.
-	
-	\color{red}???
-\end{frame}
+\begin{frame}{An algorithm adaptation approach}
+	The idea is to focus on ranking rather than binary classification \cite{ml1}
 
-\begin{frame}{Another multi label approch}
+	\begin{itemize}
+		\item Train a classifier $f_l : X \rightarrow \mathbb{R}$ for each label
+		\item For each test example sort label list according to predicted rank
+		\item Set size prediction feeding dataset and thresholds $t(X_i)$ to a classifier
+		$$t(X_i) = argmin_t\{ k \in Y_i \ s.t. \ f_k(X_i) \leq t \} + \{ k \in \bar{Y}_i \ s.t. \ f_k(X_i) \geq t \}$$
+		\item Take the best labels according to set size prediction:
+	\end{itemize}
 	
-	\begin{flushright}
-		\cite{ml1}
-	\end{flushright}
 \end{frame}

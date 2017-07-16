@@ -1,6 +1,6 @@
 \section{SVM}
-\subsection{Binary classification}
-\begin{frame}{Binary classification}
+\subsection{Classification}
+\begin{frame}{Classification problem}
 	\begin{itemize}\setlength\itemsep{1em}
 		\item[Goal:] To produce a classifier able to decide whether an object belongs to one or more classes.
 		\item[Idea:] Supervised Learning: Given a dataset of already classified examples, the classifier \textit{learns} a function that solves classification problem.
@@ -8,11 +8,14 @@
 \end{frame}
 
 \begin{frame}{Notation}
+	Dataset is set of classified examples:
+	$$D = \{(X_i, Y_i) | \ i \in [1, n]\}$$
+	$$X_i \in \R^f$$
+	$$Y_i \in \{-1, +1\}$$
 	\begin{itemize}\setlength\itemsep{1em}
 		\item A vector $x \in \mathbb{R}^f$ represents an object using $f$ \textit{relevant} features.
-		\item A vector $y \in \{-1 , +1\}^l$ indicates wether the example belong to each of the $l$ label classes.
+		\item A number $y \in \{-1 , +1\}$ indicates wether the example belong to target class.
 	\end{itemize}
-	The input of a classification problem is a dataset $D = \{X, Y\}$ where $X \in \mathbb{R}^{n\times f}$ is a set of examples and $Y \in \mathbb{R}^{n\times l}$ is a set of labels.
 	
 	While learning the target function, the dataset is divided in \textit{training set} and \textit{test set}.
 \end{frame}
@@ -20,13 +23,13 @@
 \subsection{SVM}
 \begin{frame}{SVM}
 	\begin{itemize}\setlength\itemsep{1em}
-		\item For 1-class problems we have to compute the \textit{maximum-margin hyperplane} $w^Tx + b$ which best separates positive examples from negative examples.
+		\item The idea is to compute the \textit{maximum-margin hyperplane} $w^Tx + b$ which best separates positive examples from negative examples.
 	\end{itemize}
-	Optimization problem is:
 	\begin{columns}
 		\begin{column}{0.5\textwidth}\centering
+			Optimization problem is:
 			$$arg min_w \frac{1}{2} ||w||^2$$
-			$$y_i (w^T x_i + b) \geq 1 \ \forall i \in [1, n]$$
+			$$Y_i (w^T X_i + b) \geq 1 \ \forall i \in [1, n]$$
 		\end{column}
 		\begin{column}{0.5\textwidth}\centering
 			\begin{figure}[htbp]
@@ -45,10 +48,10 @@
 	\begin{itemize}\setlength\itemsep{1em}
 		\item The examples may not be linearly serparable and so the problem would not have any solutions because constraints are not satisfied. Then we introduce slack variables $\xi$
 	\end{itemize}
-	Optimization problem becames:
 	\begin{columns}
 		\begin{column}{0.5\textwidth}\centering
-			$$arg min_{w, \xi} \frac{1}{2} ||w||^2 + C \sum_{i = 1}{n}\xi^{(i)}$$
+			Optimization problem becomes:
+			$$arg min_{w, \xi} \frac{1}{2} ||w||^2 + C \sum_{i = 1}^{n}\xi_i$$
 			$$y_i (w^T x_i + b) \geq 1 - \xi_i \ \forall i \in [1, n]$$
 			$$\xi_i \geq 0 \ \forall i \in [1, n]$$
 		\end{column}
