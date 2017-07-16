@@ -1,12 +1,12 @@
 \section{Multi Instance Learning}
  
 \subsection*{Introduction}
-\begin{frame}{Multi instance classification}
+\begin{frame}{Multi instance classification}MODIFICARE
 	Motivation:
 	\begin{itemize}\setlength\itemsep{1em}
-		\item Sometimes a complex item can be well represented by a set of \textit{features} or \textit{instances}
+		\item Sometimes a complex item can be well represented by a set of \textit{instances}
 		\item A single instance may belong or not to a class or \textit{label} (positive or negative)
-		\item An example, or \textit{bag}, is positive if at least one of its instances is positive (it is called \textit{witness}), where as a negative bag consists of only negative instances
+		\item An example, or \textit{bag}, is positive if at least one of its instances is positive, where as a negative bag consists of only negative instances
 		\item A label is provided for the
 		entire bag, not to instances
 		\item We have a \textit{semi-supervised learning} problem
@@ -26,7 +26,6 @@
 		\includegraphics[scale = 0.15]{./images/mi3.png}
 		\caption{\textit{Example of images instances refer to "zebra concept"}}
 	\end{figure}
-	\color{red}IMMAGINE MI?
 \end{frame}
 
 \subsection{SIL}
@@ -112,11 +111,47 @@
 \begin{frame}{Other common frameworks for MI}
 	In addition to these methods we can cite:
 	\begin{itemize}
-		\item \textbf{Diverse density (DD)}: DD COMPLICATO
-		\item \textbf{EM-DD}: COMPLICATO
-		\item \textbf{Citation kNN}: documento OKOK
-		\item \textbf{MIL Random forest (MIL RF)}: PAGAMENTO
-		\item \textbf{MBSTAR}: MicroRNA
+		\item \textbf{Diverse density (DD)}: It computes a probabilistic measure searching a \textit{concept point} which lies close to at least one instance of every positive bag and far away from instances of negative bags \cite{dd}
+		\item \textbf{EM-DD}: It combines \textit{EM} \cite{em} with the extended \textit{DD} algorithm \cite{emdd}
+		\item \textbf{Citation kNN}: It uses \textit{minimum Hausdorff distance} to measure the distance between bags and allows \textit{kNN} algorithms to be adapted to the MI problem \cite{miknn}
+		\item \textbf{MIL Random forest (MIL RF)}: It uses \textit{decision trees} to form \textit{Random Forests} to form a classifier \cite{rdf} \cite{rf}
 	\end{itemize}
+	\begin{flushright}
+		\cite{mbstar}
+	\end{flushright}
+\end{frame}
+
+\begin{frame}{Citation kNN}
+	The notation \textit{citation} means that the method takes not only into account the neighbors of a bag $b$ (\textbf{references}) but also the bags that count $b$ as neighbor (\textbf{citers}).
+	
+	\begin{itemize}
+		\item \textit{References} are computed as \textit{R-nearest neighbors} according to the Hausdorff distance.\\
+		The \textit{minimum Hausdorff distance} is defined as:
+		$$Dist(A,B)=\min_{\substack{1\le i\le n \\ 1\le j\le m}}(Dist(a_i,b_j))=\min_{a\in A}\min_{b\in B}\lVert a-b \rVert$$
+		where $A$ and $B$ are two bags, $a_i$ and $b_j$ are instances from each bag.
+		\item \textit{Citers} are computed as \textit{C-nearest citers} of a bag $b$ in $BS$:
+		$$Citers(b,C)={b_i\mid Rank(b_i,b)\le C, b_i\in BS}$$ 
+		where $Rank(a,b)$ is a rank function according to the similarity of examples coming from the same bag.
+	\end{itemize}
+
+	
+\end{frame}
+
+\begin{frame}{Citation kNN}
+	Let $p_b = R_{b,p} + C_{b,p}$ the number of positive references and positive citers of the bag $b$ and $n_b = R_{b,n} + C_{b,n}$ the same for the negatives.\\
+	\vspace{10px}
+	The \textit{Citation-KNN} is the \textit{KNN} algorithm in which $p_b$ and $n_b$ are computed by using the Hausdorff distance and classification is defined as:
+	
+	$$y_b = 
+	\begin{cases}
+		positive, & \mbox{if} \ p_b > n_b\\
+		negative, & \mbox{otherwise}
+	\end{cases}$$
+	
+	where $y_b$ is the class of the bag $b$
+	
+	\begin{flushright}
+		\cite{miknn}
+	\end{flushright}
 \end{frame}
 

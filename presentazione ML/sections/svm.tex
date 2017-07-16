@@ -13,8 +13,8 @@
 	$$X_i \in \R^f$$
 	$$Y_i \in \{-1, +1\}$$
 	\begin{itemize}\setlength\itemsep{1em}
-		\item A vector $x \in \mathbb{R}^f$ represents an object using $f$ \textit{relevant} features.
-		\item A number $y \in \{-1 , +1\}$ indicates wether the example belong to target class.
+		\item A vector $x \in \mathbb{R}^f$ represents an object using $f$ \textit{relevant} features
+		\item A number $y \in \{-1 , +1\}$ indicates wether the example belong to target class
 	\end{itemize}
 	
 	While learning the target function, the dataset is divided in \textit{training set} and \textit{test set}.
@@ -23,8 +23,10 @@
 \subsection{SVM}
 \begin{frame}{SVM}
 	\begin{itemize}\setlength\itemsep{1em}
-		\item The idea is to compute the \textit{maximum-margin hyperplane} $w^Tx + b$ which best separates positive examples from negative examples.
+		\item The idea is to compute the \textit{maximum-margin hyperplane} $w^Tx + b$ which best separates positive examples from negative examples
+		\item Samples on the margin are called the \textit{support vectors}
 	\end{itemize}
+	\vspace{-20px}
 	\begin{columns}
 		\begin{column}{0.5\textwidth}\centering
 			Optimization problem is:
