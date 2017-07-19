@@ -77,8 +77,8 @@ if __name__ == "__main__":
         config_file = None
     p = prepareMIML.PrepareMIML(config_file)
 
-    # dataset = p.arrayMatrixInstancesDictionary('./dataset/reut2-000.sgm')
-    dataset = p.arrayMatrixInstancesDictionary(None)
+    dataset = p.arrayMatrixInstancesDictionary('./dataset/reut2-000.sgm')
+    # dataset = p.arrayMatrixInstancesDictionary(None)
 
     # print dense_matrix[3] #matrice instanza dizionario del documento 3
     # print dense_matrix[3][2] #dizionario dell'instanza 2 del doc 3

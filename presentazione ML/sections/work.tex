@@ -5,14 +5,14 @@
 	The aim of our work is to replicate a part of the results of \cite{miml1} using the \textbf{MIML framework} and compare the different metrics.\\
 	\vspace{12px}
 	\begin{itemize}
-		\item We focused on the \textit{text categorization} using text documents (\textit{bags}) belonging to categories (\textit{labels})
-		\item We choose to use the \textsc{MimlBoost} solution using multi-instance learning as the bridge between MIML and SISL
+		\item We focused on \textit{text categorization} using text documents (\textit{bags}) belonging to categories (\textit{labels})
+		\item We choose to use multi-instance learning as the bridge between MIML and SISL
 		\item Bag of words approach to \textsc{Reuters-21578} dataset
 		\item Multi instance tasks solved with SIL, MI-SVM and mi-SVM approaches
 	\end{itemize}
 \end{frame}
 
-\begin{frame}{Test}
+\begin{frame}{Dataset processing}
 	Documents selection:
 	\begin{enumerate}
 		\item Removed every document with 0 labels
@@ -81,8 +81,8 @@
  & \multicolumn{7}{l}{Metrics} \\ \cline{2-8} 
 Algorithms & hloss & one-error & coverage & rloss & aveprec & averecl & aveF1 \\ \hline
 $MimlBoost$ & .053±.004 & .094±.014 & .387±.037 & .035±.005 & .937±.008 & .792±.010 & .858±.008 \\
-$MimlSvm$ & .033±.003 & .066±.011 & .313±.035 & .023±.004 & .956±.006 & .925±.010 & .940±.008 \\
-$MimlSvm_{mi}$ & .041±.004 & .055±.009 & .284±.030 & .020±.003 & .965±.005 & .921±.012 & .942±.007 \\
+$MimlSvm$ & \textbf{.033±.003} & .066±.011 & .313±.035 & .023±.004 & .956±.006 & \textbf{.925±.010} & .940±.008 \\
+$MimlSvm_{mi}$ & .041±.004 & .055±.009 & .284±.030 & \textbf{.020±.003} & \textbf{.965±.005} & .921±.012 & \textbf{.942±.007} \\
 $MimlNn$ & .038±.002 & .080±.010 & .320±.030 & .025±.003 & .950±.006 & .834±.011 & .888±.008 \\
  &  &  &  &  &  &  &  \\
 $AdtBoost.MH$ &  .055±.005 & .120±.017 & .409±.047 & N/A & .926±.011 & N/A & N/A\\
@@ -90,8 +90,8 @@ $RankSvm$ & .120±.013 & .196±.126 & .695±.466 & .085±.077 & .868±.092 & .41
 $MlSvm$ & .050±.003 & .081±.011 & .329±.029 & .026±.003 & .949±.006 & .777±.016 & .854±.011\\
 $Ml-knn$ & .049±.003 & .126±.012 & .440±.035 & .045±.004 & .920±.007 & .821±.021 & .867±.013 \\
  &  &  &  &  &  &  &  \\
-$SIL$ & .072±.002 & .129±.017 & .104±.036 & .025±.004 & .865±.012 & .797±.020 & .829±.016 \\
-$MISVM$ & .134±.004 & .015±.008 & .666±.054 & .214±.011 & .636±.019 & .425±.008 & .509±.011 \\
+$SIL$ & .072±.002 & .129±.017 & \textbf{.104±.036} & .025±.004 & .865±.012 & .797±.020 & .829±.016 \\
+$MISVM$ & .134±.004 & \textbf{.015±.008} & .666±.054 & .214±.011 & .636±.019 & .425±.008 & .509±.011 \\
 $mi-SVM$ & .111±.003 & .041±.010 & .295±.073 & .121±.013 & .746±.025 & .534±.014 & .626±.018 \\ \hline
 \end{tabular}
 \end{table}
@@ -100,7 +100,7 @@ $mi-SVM$ & .111±.003 & .041±.010 & .295±.073 & .121±.013 & .746±.025 & .534
 
 \begin{frame}{Considerations}
 	\begin{itemize}
-		\item Scores are quite low, but \textit{one-error} is low even if it's not a good metric for evaluating multilabel performance
+		\item Scores are quite low, but looking at \textit{one-error} metric we see that our classifier has potential
 		\item Selected labels' frequencies are  520, 434, 283, 222, 223, 220, 187 over 2000 documents.
 		\item Test repeated for best 2 labels with following results
 	\end{itemize}
@@ -112,9 +112,10 @@ $mi-SVM$ & .111±.003 & .041±.010 & .295±.073 & .121±.013 & .746±.025 & .534
 \hline
  & \multicolumn{7}{l}{Metrics} \\ \cline{2-8} 
 Algorithms & hloss & one-error & coverage & rloss & aveprec & averecl & aveF1 \\ \hline
-$SIL$ & .072±.002 & .129±.017 & .104±.036 & .025±.004 & .865±.012 & .797±.020 & .829±.016 \\
-$MISVM$ & .134±.004 & .015±.008 & .666±.054 & .214±.011 & .636±.019 & .425±.008 & .509±.011 \\
-$mi-SVM$ &  &  &  &  &  &  &  \\ \hline
+$SIL$ & .099±.007 & .141±.005 & .005±.001 & .005±.001 & .998±.001 & .948±.006 & .972±.003 \\
+$MI-SVM$ & .182±.007 & .012±.001 & .022±.011 & .022±.011 & .989±.006 & .650±.013 & .785±.010 \\
+$mi-SVM$ & .126±.013 & .036±.012 & .015±.010 & .015±.010 & .993±.005 & .785±.018 & .877±.013 \\
+
 \end{tabular}
 \end{table}
 \end{tiny}

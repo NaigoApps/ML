@@ -5,8 +5,9 @@
 	MIML problems combine motivations of multi instance and multi label ones.
 	
 	Given a set of labels $L = \{y_1, y_2,... y_l\}$
-	$$X_i = \{x_{i,k} | k \in [1, k_i], x_{i,k} \in \R^f\} Y_i = \{y_{i,h} | h \in [1, h_i], y_{i,h} \in L, h_i \leq l\}$$
 	$$D = \{(X_i, Y_i) | i \in [1, n]\}$$
+	$$X_i = \{x_{i,k} | k \in [1, k_i], x_{i,k} \in \R^f\}$$
+	$$Y_i = \{y_{i,h} | h \in [1, h_i], y_{i,h} \in L, h_i \leq l\}$$
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[scale = 0.20]{./images/confronto-miml.png}
@@ -36,7 +37,7 @@
 	Excluding lossy approaches, the idea is to train a multi-instance (single label) classifier for each label.
 	
 	Given a MIML dataset $D = \{(X_i, Y_i) | i \in [1, n]\}$	we produce $l$ datasets as follows:
-	$$D_{y_j} = \{(X_i, Y_{y_j}) | i \in [1, n]\} \ \forall j \in [1, L]$$
+	$$D_{y_j} = \{(X_i, Y_{y_j}) | i \in [1, n]\} \ \forall j \in [1, l]$$
 	Where
 	$$Y_{y_j} = 
 	\begin{cases}
